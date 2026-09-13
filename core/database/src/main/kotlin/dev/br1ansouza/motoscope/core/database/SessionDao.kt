@@ -24,6 +24,14 @@ internal interface SessionDao {
     )
     suspend fun finish(id: String, endedAtEpochMillis: Long, status: String): Int
 
+    @Query("UPDATE sessions SET status = 'RECORDING' WHERE id = :id AND endedAtEpochMillis IS NULL")
+    suspend fun resume(id: String): Int
+
+    @Query(
+        "UPDATE sessions SET status = 'INTERRUPTED' WHERE endedAtEpochMillis IS NULL AND status = 'RECORDING'"
+    )
+    suspend fun markUnfinishedInterrupted()
+
     @Query("DELETE FROM sessions WHERE id = :id")
     suspend fun delete(id: String): Int
 }

@@ -5,6 +5,8 @@ import dev.br1ansouza.motoscope.core.model.RecordingSession
 sealed interface RecordingState {
     data object Idle : RecordingState
 
+    data object Failed : RecordingState
+
     data class Active(
         val session: RecordingSession,
         val samplesWritten: Long,

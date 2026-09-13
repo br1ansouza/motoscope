@@ -34,10 +34,14 @@ internal fun RecordingControl(
     onStop: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val active = state is RecordingState.Active
+    val active = state != RecordingState.Idle
     val haptics = LocalHapticFeedback.current
     val label = stringResource(
-        if (active) R.string.dashboard_stop_recording else R.string.dashboard_start_recording
+        when (state) {
+            RecordingState.Failed -> R.string.dashboard_recording_retry
+            is RecordingState.Active -> R.string.dashboard_stop_recording
+            RecordingState.Idle -> R.string.dashboard_start_recording
+        }
     )
     Surface(
         modifier = modifier

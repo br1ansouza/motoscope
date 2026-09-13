@@ -41,7 +41,7 @@
     <string name="dashboard_layout_primary_top">RPM em cima, demais embaixo</string>
     <string name="dashboard_layout_primary_centered">Metade em cima, RPM no meio, metade embaixo</string>
     <string name="dashboard_layout_uniform">Todos do mesmo tamanho</string>
-    <string name="dashboard_vehicle_engine">%1$d cm³ · corte estimado %2$s rpm</string>
+    <string name="dashboard_vehicle_engine">%1$d cm³ · corte não validado: %2$s rpm</string>
     <string name="dashboard_metrics_open">MÉTRICAS</string>
     <string name="dashboard_metrics_close">FECHAR</string>
     <string name="dashboard_unit_kmh">km/h</string>
@@ -49,4 +49,6 @@
     <string name="dashboard_unit_celsius">°C</string>
     <string name="dashboard_unit_volt">V</string>
     <string name="dashboard_unit_percent">%</string>
+    <string name="dashboard_recording_failed">Falha ao gravar</string>
+    <string name="dashboard_recording_retry">SEGURE PARA SALVAR E ENCERRAR</string>
 </resources>
