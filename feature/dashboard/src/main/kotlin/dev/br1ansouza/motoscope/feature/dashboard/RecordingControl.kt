@@ -1,5 +1,6 @@
 package dev.br1ansouza.motoscope.feature.dashboard
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,8 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import dev.br1ansouza.motoscope.core.recording.RecordingState
+import dev.br1ansouza.motoscope.core.ui.theme.MotoScopePalette
+import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeStatusColors
 
@@ -36,7 +39,12 @@ internal fun RecordingControl(
                 onLongClick = { if (active) onStop() }
             ),
         shape = MaterialTheme.shapes.large,
-        color = if (active) MotoScopeStatusColors.failure else MaterialTheme.colorScheme.primary
+        color = if (active) {
+            MotoScopeStatusColors.recording
+        } else {
+            MaterialTheme.colorScheme.primary
+        },
+        border = BorderStroke(MotoScopeSizes.fieldBorder, MotoScopePalette.gold)
     ) {
         Column(
             modifier = Modifier.padding(MotoScopeSpacing.medium),
@@ -52,7 +60,7 @@ internal fun RecordingControl(
                     }
                 ),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MotoScopePalette.ink,
                 textAlign = TextAlign.Center
             )
             if (state is RecordingState.Active) {
@@ -66,7 +74,7 @@ internal fun RecordingControl(
                         total
                     ),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MotoScopePalette.gold
                 )
             }
         }

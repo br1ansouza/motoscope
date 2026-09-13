@@ -83,7 +83,7 @@ internal object TelemetryModule {
 
     private const val DELAYED_AFTER_MILLIS = 1_500L
     private const val ABSENT_AFTER_MILLIS = 4_000L
-    private const val REFRESH_INTERVAL_MILLIS = 400L
-    private const val BATCH_SIZE = 64
+    private const val REFRESH_INTERVAL_MILLIS = 250L
+    private const val BATCH_SIZE = 128
     private const val FLUSH_INTERVAL_MILLIS = 2_000L
 }

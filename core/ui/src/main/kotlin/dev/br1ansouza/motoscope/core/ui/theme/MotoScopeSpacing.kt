@@ -11,4 +11,7 @@ object MotoScopeSpacing {
 
 object MotoScopeSizes {
     val indicatorDot = 10.dp
+    val fieldBorder = 1.dp
+    val accentBar = 3.dp
+    val rpmBarHeight = 28.dp
 }
