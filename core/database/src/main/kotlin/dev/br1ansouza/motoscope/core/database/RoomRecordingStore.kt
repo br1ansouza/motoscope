@@ -1,5 +1,6 @@
 package dev.br1ansouza.motoscope.core.database
 
+import androidx.room.withTransaction
 import dev.br1ansouza.motoscope.core.model.RecordingSession
 import dev.br1ansouza.motoscope.core.model.SessionEvent
 import dev.br1ansouza.motoscope.core.model.SessionId
@@ -9,19 +10,23 @@ import dev.br1ansouza.motoscope.core.recording.RecordingStore
 import javax.inject.Inject
 
 internal class RoomRecordingStore @Inject constructor(
+    private val database: MotoScopeDatabase,
     private val sessions: SessionDao,
     private val samples: SampleDao,
     private val events: SessionEventDao
 ) : RecordingStore {
-    override suspend fun createSession(session: RecordingSession) {
-        sessions.insert(
-            SessionEntity(
-                id = session.id.value,
-                startedAtEpochMillis = session.startedAtEpochMillis,
-                endedAtEpochMillis = session.endedAtEpochMillis,
-                status = session.status.name
+    override suspend fun createSession(session: RecordingSession, event: SessionEvent) {
+        database.withTransaction {
+            sessions.insert(
+                SessionEntity(
+                    id = session.id.value,
+                    startedAtEpochMillis = session.startedAtEpochMillis,
+                    endedAtEpochMillis = session.endedAtEpochMillis,
+                    status = session.status.name
+                )
             )
-        )
+            appendEvent(session.id, event)
+        }
     }
 
     override suspend fun appendSamples(id: SessionId, samples: List<TelemetrySample>) {
@@ -41,11 +46,29 @@ internal class RoomRecordingStore @Inject constructor(
         )
     }
 
-    override suspend fun finishSession(
+    override suspend fun completeSession(
         id: SessionId,
-        endedAtEpochMillis: Long,
+        samples: List<TelemetrySample>,
+        event: SessionEvent,
         status: SessionStatus
-    ): Boolean = sessions.finish(id.value, endedAtEpochMillis, status.name) == 1
+    ) {
+        database.withTransaction {
+            check(sessions.finish(id.value, event.wallClockEpochMillis, status.name) == 1) {
+                "Não foi possível encerrar a sessão."
+            }
+            appendSamples(id, samples)
+            appendEvent(id, event)
+        }
+    }
+
+    override suspend fun resumeSession(id: SessionId, event: SessionEvent): Long =
+        database.withTransaction {
+            check(sessions.resume(id.value) == 1) { "Não foi possível recuperar a sessão." }
+            appendEvent(id, event)
+            samples.countBySession(id.value).toLong()
+        }
+
+    override suspend fun markUnfinishedInterrupted() = sessions.markUnfinishedInterrupted()
 
     override suspend fun findUnfinished(): List<RecordingSession> =
         sessions.findUnfinished().map { entity ->

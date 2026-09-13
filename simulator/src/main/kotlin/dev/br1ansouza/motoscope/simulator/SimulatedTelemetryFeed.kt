@@ -21,6 +21,10 @@ class SimulatedTelemetryFeed(
     private val wallClock: () -> Long = System::currentTimeMillis,
     private val sampleIntervalMillis: Long = FAST_INTERVAL_MILLIS
 ) : TelemetryFeed {
+    init {
+        require(sampleIntervalMillis > 0) { "Intervalo do simulador precisa ser positivo." }
+    }
+
     override val isSimulated: Boolean = true
 
     override fun events(): Flow<TelemetryEvent> = flow {
@@ -111,7 +115,7 @@ class SimulatedTelemetryFeed(
         metric = metric,
         value = value,
         unit = unit,
-        source = TelemetrySource.ECU,
+        source = TelemetrySource.SIMULATOR,
         monotonicMillis = clock.millis(),
         wallClockEpochMillis = wallClock()
     )

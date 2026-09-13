@@ -178,6 +178,12 @@ internal fun EcuState.indicator(): IndicatorState = when (this) {
 }
 
 internal fun RecordingState.indicator(): IndicatorState = when (this) {
+    RecordingState.Failed -> IndicatorState(
+        R.string.dashboard_indicator_recording,
+        R.string.dashboard_recording_failed,
+        MotoScopeStatusColors.failure
+    )
+
     is RecordingState.Idle -> IndicatorState(
         R.string.dashboard_indicator_recording,
         R.string.dashboard_recording_idle,
