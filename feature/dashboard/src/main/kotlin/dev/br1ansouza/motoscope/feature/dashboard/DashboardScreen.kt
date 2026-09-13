@@ -1,18 +1,24 @@
 package dev.br1ansouza.motoscope.feature.dashboard
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +33,7 @@ import dev.br1ansouza.motoscope.core.model.TelemetrySample
 import dev.br1ansouza.motoscope.core.model.TelemetrySource
 import dev.br1ansouza.motoscope.core.model.TransportState
 import dev.br1ansouza.motoscope.core.recording.RecordingState
+import dev.br1ansouza.motoscope.core.settings.DashboardMetrics
 import dev.br1ansouza.motoscope.core.telemetry.LiveTelemetry
 import dev.br1ansouza.motoscope.core.telemetry.MetricReading
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeReadingColors
@@ -39,10 +46,11 @@ import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
 fun DashboardScreen(
     state: LiveTelemetry,
     recording: RecordingState,
-    onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
+    visibleMetrics: Set<TelemetryMetric>,
+    actions: DashboardActions,
     modifier: Modifier = Modifier
 ) {
+    var pickerOpen by rememberSaveable { mutableStateOf(false) }
     Surface(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -54,6 +62,13 @@ fun DashboardScreen(
                 leading = listOf(state.transport.indicator(), state.ecu.indicator()),
                 trailing = listOf(recording.indicator())
             )
+            if (pickerOpen) {
+                MetricPicker(
+                    visible = visibleMetrics,
+                    onToggle = actions.onToggleMetric,
+                    onClose = { pickerOpen = false }
+                )
+            }
             if (state.simulated) {
                 Text(
                     text = stringResource(R.string.dashboard_simulated),
@@ -70,12 +85,19 @@ fun DashboardScreen(
                 reading = state.reading(TelemetryMetric.ENGINE_RPM),
                 modifier = Modifier.weight(1f)
             )
-            SecondaryRow(state = state)
-            RecordingControl(
-                state = recording,
-                onStart = onStartRecording,
-                onStop = onStopRecording
-            )
+            SecondaryGrid(state = state, metrics = visibleMetrics)
+            Row(
+                modifier = Modifier.height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
+            ) {
+                MetricsButton(onClick = { pickerOpen = !pickerOpen })
+                RecordingControl(
+                    state = recording,
+                    onStart = actions.onStartRecording,
+                    onStop = actions.onStopRecording,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
@@ -109,48 +131,52 @@ private fun MetricReading?.rpmFraction(): Float {
 }
 
 @Composable
-private fun SecondaryRow(state: LiveTelemetry) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
-    ) {
-        SecondaryReading(
-            label = R.string.dashboard_engine_temperature,
-            unit = R.string.dashboard_unit_celsius,
-            reading = state.reading(TelemetryMetric.ENGINE_TEMPERATURE),
-            modifier = Modifier.weight(1f)
-        )
-        SecondaryReading(
-            label = R.string.dashboard_system_voltage,
-            unit = R.string.dashboard_unit_volt,
-            reading = state.reading(TelemetryMetric.SYSTEM_VOLTAGE),
-            modifier = Modifier.weight(1f)
-        )
-        SecondaryReading(
-            label = R.string.dashboard_throttle,
-            unit = R.string.dashboard_unit_percent,
-            reading = state.reading(TelemetryMetric.THROTTLE_POSITION),
-            modifier = Modifier.weight(1f)
-        )
+private fun SecondaryGrid(state: LiveTelemetry, metrics: Set<TelemetryMetric>) {
+    val ordered = DashboardMetrics.SELECTABLE.filter { it in metrics }
+    if (ordered.isEmpty()) return
+    Column(verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)) {
+        ordered.chunked(COLUMNS).forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
+            ) {
+                row.forEach { metric ->
+                    SecondaryReading(
+                        metric = metric,
+                        reading = state.reading(metric),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                repeat(COLUMNS - row.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
     }
 }
 
 @Composable
 private fun SecondaryReading(
-    @StringRes label: Int,
-    @StringRes unit: Int,
+    metric: TelemetryMetric,
     reading: MetricReading?,
     modifier: Modifier = Modifier
 ) {
-    Field(label = label, modifier = modifier) {
+    val labels = metric.labels()
+    Field(label = labels.name, modifier = modifier) {
         FieldValue(
             value = reading.display(),
-            unit = if (reading?.freshness == Freshness.ABSENT) null else stringResource(unit),
+            unit = if (reading?.freshness == Freshness.ABSENT) {
+                null
+            } else {
+                stringResource(labels.unit)
+            },
             color = reading.freshnessColor(),
             large = false
         )
     }
 }
+
+private const val COLUMNS = 3
 
 @Composable
 private fun MetricReading?.display(): String = if (this == null || freshness == Freshness.ABSENT) {
@@ -173,8 +199,12 @@ private fun DashboardScreenPreview() {
         DashboardScreen(
             state = previewState(),
             recording = RecordingState.Idle,
-            onStartRecording = {},
-            onStopRecording = {}
+            visibleMetrics = DashboardMetrics.DEFAULT_VISIBLE,
+            actions = DashboardActions(
+                onToggleMetric = { _, _ -> },
+                onStartRecording = {},
+                onStopRecording = {}
+            )
         )
     }
 }

@@ -1,6 +1,9 @@
 package dev.br1ansouza.motoscope
 
+import dev.br1ansouza.motoscope.core.model.TelemetryMetric
 import dev.br1ansouza.motoscope.core.recording.RecordingEngine
+import dev.br1ansouza.motoscope.core.settings.DashboardMetrics
+import dev.br1ansouza.motoscope.core.settings.MetricVisibilityStore
 import dev.br1ansouza.motoscope.core.telemetry.LiveTelemetry
 import dev.br1ansouza.motoscope.core.telemetry.TelemetryEngine
 import dev.br1ansouza.motoscope.core.telemetry.TelemetryHub
@@ -17,10 +20,17 @@ internal class TelemetryRuntime @Inject constructor(
     private val hub: TelemetryHub,
     private val engine: TelemetryEngine,
     val recording: RecordingEngine,
+    private val metrics: MetricVisibilityStore,
     private val scope: CoroutineScope
 ) {
+    val visibleMetrics: StateFlow<Set<TelemetryMetric>> = metrics.visibleMetrics()
+        .stateIn(scope, SharingStarted.Eagerly, DashboardMetrics.DEFAULT_VISIBLE)
     val telemetry: StateFlow<LiveTelemetry> = engine.state()
         .stateIn(scope, SharingStarted.Eagerly, LiveTelemetry())
+
+    suspend fun setMetricVisible(metric: TelemetryMetric, visible: Boolean) {
+        metrics.setVisible(metric, visible)
+    }
 
     fun start() {
         scope.launch { recording.run() }

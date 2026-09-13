@@ -3,7 +3,11 @@ package dev.br1ansouza.motoscope.core.database
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-internal val MIGRATION_1_2 = object : Migration(1, 2) {
+internal const val SCHEMA_V1 = 1
+internal const val SCHEMA_V2 = 2
+internal const val SCHEMA_V3 = 3
+
+internal val MIGRATION_1_2 = object : Migration(SCHEMA_V1, SCHEMA_V2) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS `sessions_new` (" +
@@ -56,6 +60,17 @@ internal val MIGRATION_1_2 = object : Migration(1, 2) {
         db.execSQL(
             "CREATE INDEX IF NOT EXISTS `index_session_events_sessionId_monotonicMillis` " +
                 "ON `session_events` (`sessionId`, `monotonicMillis`)"
+        )
+    }
+}
+
+internal val MIGRATION_2_3 = object : Migration(SCHEMA_V2, SCHEMA_V3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `metric_preferences` (" +
+                "`metric` TEXT NOT NULL, " +
+                "`visible` INTEGER NOT NULL, " +
+                "PRIMARY KEY(`metric`))"
         )
     }
 }
