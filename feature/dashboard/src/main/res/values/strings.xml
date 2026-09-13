@@ -19,6 +19,13 @@
     <string name="dashboard_ecu_delayed">atrasada</string>
     <string name="dashboard_ecu_responding">respondendo</string>
     <string name="dashboard_recording_idle">parado</string>
+    <string name="dashboard_recording_active">gravando</string>
+    <string name="dashboard_start_recording">INICIAR GRAVAÇÃO</string>
+    <string name="dashboard_stop_recording">SEGURE PARA FINALIZAR</string>
+    <plurals name="dashboard_recording_counter">
+        <item quantity="one">%1$d amostra</item>
+        <item quantity="other">%1$d amostras</item>
+    </plurals>
     <string name="dashboard_unit_celsius">°C</string>
     <string name="dashboard_unit_volt">V</string>
     <string name="dashboard_unit_percent">%</string>

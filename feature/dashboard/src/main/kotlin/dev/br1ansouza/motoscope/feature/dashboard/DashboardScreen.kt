@@ -26,6 +26,7 @@ import dev.br1ansouza.motoscope.core.model.TelemetryMetric
 import dev.br1ansouza.motoscope.core.model.TelemetrySample
 import dev.br1ansouza.motoscope.core.model.TelemetrySource
 import dev.br1ansouza.motoscope.core.model.TransportState
+import dev.br1ansouza.motoscope.core.recording.RecordingState
 import dev.br1ansouza.motoscope.core.telemetry.LiveTelemetry
 import dev.br1ansouza.motoscope.core.telemetry.MetricReading
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
@@ -33,7 +34,13 @@ import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeStatusColors
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
 
 @Composable
-fun DashboardScreen(state: LiveTelemetry, modifier: Modifier = Modifier) {
+fun DashboardScreen(
+    state: LiveTelemetry,
+    recording: RecordingState,
+    onStartRecording: () -> Unit,
+    onStopRecording: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Surface(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -43,12 +50,8 @@ fun DashboardScreen(state: LiveTelemetry, modifier: Modifier = Modifier) {
         ) {
             IndicatorRow(
                 leading = listOf(state.transport.indicator(), state.ecu.indicator()),
-                trailing = listOf(recordingIndicator())
+                trailing = listOf(recording.indicator())
             )
-            Spacer(modifier = Modifier.weight(1f))
-            PrimaryReading(reading = state.reading(TelemetryMetric.ENGINE_RPM))
-            Spacer(modifier = Modifier.weight(1f))
-            SecondaryRow(state = state)
             if (state.simulated) {
                 Text(
                     text = stringResource(R.string.dashboard_simulated),
@@ -58,6 +61,15 @@ fun DashboardScreen(state: LiveTelemetry, modifier: Modifier = Modifier) {
                     textAlign = TextAlign.Center
                 )
             }
+            Spacer(modifier = Modifier.weight(1f))
+            PrimaryReading(reading = state.reading(TelemetryMetric.ENGINE_RPM))
+            Spacer(modifier = Modifier.weight(1f))
+            SecondaryRow(state = state)
+            RecordingControl(
+                state = recording,
+                onStart = onStartRecording,
+                onStop = onStopRecording
+            )
         }
     }
 }
@@ -148,7 +160,14 @@ private fun MetricReading?.freshnessColor(): Color = when (this?.freshness) {
 @Preview(showBackground = true, widthDp = 400, heightDp = 720)
 @Composable
 private fun DashboardScreenPreview() {
-    MotoScopeTheme { DashboardScreen(state = previewState()) }
+    MotoScopeTheme {
+        DashboardScreen(
+            state = previewState(),
+            recording = RecordingState.Idle,
+            onStartRecording = {},
+            onStopRecording = {}
+        )
+    }
 }
 
 private fun previewState() = LiveTelemetry(
