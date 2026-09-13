@@ -19,8 +19,11 @@ internal interface SessionDao {
     suspend fun findUnfinished(): List<SessionEntity>
 
     @Query(
-        "UPDATE sessions SET endedAtEpochMillis = :endedAtEpochMillis " +
+        "UPDATE sessions SET endedAtEpochMillis = :endedAtEpochMillis, status = :status " +
             "WHERE id = :id AND endedAtEpochMillis IS NULL AND startedAtEpochMillis <= :endedAtEpochMillis"
     )
-    suspend fun finish(id: String, endedAtEpochMillis: Long): Int
+    suspend fun finish(id: String, endedAtEpochMillis: Long, status: String): Int
+
+    @Query("DELETE FROM sessions WHERE id = :id")
+    suspend fun delete(id: String): Int
 }

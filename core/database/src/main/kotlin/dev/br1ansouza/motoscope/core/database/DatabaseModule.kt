@@ -15,8 +15,17 @@ internal object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): MotoScopeDatabase =
-        Room.databaseBuilder(context, MotoScopeDatabase::class.java, "motoscope.db").build()
+        Room.databaseBuilder(context, MotoScopeDatabase::class.java, "motoscope.db")
+            .addMigrations(MIGRATION_1_2)
+            .build()
 
     @Provides
     fun provideSessionDao(database: MotoScopeDatabase): SessionDao = database.sessionDao()
+
+    @Provides
+    fun provideSampleDao(database: MotoScopeDatabase): SampleDao = database.sampleDao()
+
+    @Provides
+    fun provideSessionEventDao(database: MotoScopeDatabase): SessionEventDao =
+        database.sessionEventDao()
 }
