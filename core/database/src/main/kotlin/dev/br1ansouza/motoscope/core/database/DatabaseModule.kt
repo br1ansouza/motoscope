@@ -2,11 +2,13 @@ package dev.br1ansouza.motoscope.core.database
 
 import android.content.Context
 import androidx.room.Room
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dev.br1ansouza.motoscope.core.recording.RecordingStore
 import javax.inject.Singleton
 
 @Module
@@ -28,4 +30,11 @@ internal object DatabaseModule {
     @Provides
     fun provideSessionEventDao(database: MotoScopeDatabase): SessionEventDao =
         database.sessionEventDao()
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+internal abstract class RecordingStoreModule {
+    @Binds
+    abstract fun bindRecordingStore(store: RoomRecordingStore): RecordingStore
 }

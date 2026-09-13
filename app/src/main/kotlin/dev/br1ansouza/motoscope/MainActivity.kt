@@ -7,18 +7,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import dagger.hilt.android.AndroidEntryPoint
-import dev.br1ansouza.motoscope.core.telemetry.LiveTelemetry
-import dev.br1ansouza.motoscope.core.telemetry.TelemetryEngine
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
 import dev.br1ansouza.motoscope.feature.dashboard.DashboardScreen
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
-    lateinit var engine: TelemetryEngine
+    internal lateinit var runtime: TelemetryRuntime
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +27,15 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             MotoScopeTheme {
-                val telemetry = remember { engine.state() }
-                val state by telemetry.collectAsState(initial = LiveTelemetry())
-                DashboardScreen(state = state)
+                val state by runtime.telemetry.collectAsState()
+                val recording by runtime.recording.state.collectAsState()
+                val scope = rememberCoroutineScope()
+                DashboardScreen(
+                    state = state,
+                    recording = recording,
+                    onStartRecording = { scope.launch { runtime.recording.start() } },
+                    onStopRecording = { scope.launch { runtime.recording.stop() } }
+                )
             }
         }
     }

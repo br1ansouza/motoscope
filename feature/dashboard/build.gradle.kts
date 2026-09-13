@@ -10,6 +10,7 @@ android {
 
 dependencies {
     api(project(":core:telemetry"))
+    api(project(":core:recording"))
     implementation(project(":core:ui"))
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)

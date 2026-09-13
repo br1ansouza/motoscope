@@ -50,6 +50,7 @@ hilt { enableAggregatingTask = true }
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:telemetry"))
+    implementation(project(":core:recording"))
     implementation(project(":feature:dashboard"))
     implementation(project(":simulator"))
     implementation(project(":core:database"))

@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import dev.br1ansouza.motoscope.core.model.EcuState
 import dev.br1ansouza.motoscope.core.model.TransportState
+import dev.br1ansouza.motoscope.core.recording.RecordingState
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeStatusColors
@@ -135,8 +136,16 @@ internal fun EcuState.indicator(): IndicatorState = when (this) {
     )
 }
 
-internal fun recordingIndicator(): IndicatorState = IndicatorState(
-    R.string.dashboard_indicator_recording,
-    R.string.dashboard_recording_idle,
-    MotoScopeStatusColors.disabled
-)
+internal fun RecordingState.indicator(): IndicatorState = when (this) {
+    is RecordingState.Idle -> IndicatorState(
+        R.string.dashboard_indicator_recording,
+        R.string.dashboard_recording_idle,
+        MotoScopeStatusColors.disabled
+    )
+
+    is RecordingState.Active -> IndicatorState(
+        R.string.dashboard_indicator_recording,
+        R.string.dashboard_recording_active,
+        MotoScopeStatusColors.failure
+    )
+}
