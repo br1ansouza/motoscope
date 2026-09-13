@@ -1,6 +1,7 @@
 package dev.br1ansouza.motoscope.feature.dashboard
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +26,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import dev.br1ansouza.motoscope.core.model.TelemetryMetric
 import dev.br1ansouza.motoscope.core.settings.DashboardLayout
@@ -94,14 +98,10 @@ private fun ConfigurationSections(settings: DashboardSettings, actions: Dashboar
             }
         }
         Section(R.string.dashboard_section_layout, expandedByDefault = true) {
-            DashboardLayout.entries.forEach { layout ->
-                ChoiceRow(
-                    label = stringResource(layout.labelRes()),
-                    detail = null,
-                    selected = layout == settings.layout,
-                    onClick = { actions.onSelectLayout(layout) }
-                )
-            }
+            LayoutChooser(
+                selected = settings.layout,
+                onSelect = actions.onSelectLayout
+            )
         }
         Section(R.string.dashboard_section_vehicle, expandedByDefault = false) {
             VehicleCatalog.ALL.forEach { profile ->
@@ -162,6 +162,44 @@ private fun Section(
         }
     }
 }
+
+@Composable
+private fun LayoutChooser(selected: DashboardLayout, onSelect: (DashboardLayout) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
+    ) {
+        DashboardLayout.entries.forEach { layout ->
+            val label = stringResource(layout.labelRes())
+            Image(
+                painter = painterResource(layout.iconRes()),
+                contentDescription = label,
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(1f)
+                    .border(
+                        width = MotoScopeSizes.fieldBorder,
+                        color = if (layout == selected) {
+                            MotoScopePalette.gold
+                        } else {
+                            MaterialTheme.colorScheme.outline
+                        }
+                    )
+                    .clickable(onClickLabel = label) { onSelect(layout) }
+                    .padding(MotoScopeSpacing.tiny)
+                    .alpha(if (layout == selected) 1f else UNSELECTED_ALPHA)
+            )
+        }
+    }
+}
+
+private fun DashboardLayout.iconRes(): Int = when (this) {
+    DashboardLayout.PRIMARY_TOP -> R.drawable.ic_layout_primary_top
+    DashboardLayout.PRIMARY_CENTERED -> R.drawable.ic_layout_primary_centered
+    DashboardLayout.UNIFORM -> R.drawable.ic_layout_uniform
+}
+
+private const val UNSELECTED_ALPHA = 0.45f
 
 @Composable
 private fun ChoiceRow(label: String, detail: String?, selected: Boolean, onClick: () -> Unit) {
