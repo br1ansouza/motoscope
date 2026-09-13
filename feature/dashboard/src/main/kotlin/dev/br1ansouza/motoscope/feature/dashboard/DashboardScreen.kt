@@ -42,11 +42,8 @@ fun DashboardScreen(state: LiveTelemetry, modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.large)
         ) {
             IndicatorRow(
-                indicators = listOf(
-                    state.transport.indicator(),
-                    state.ecu.indicator(),
-                    recordingIndicator()
-                )
+                leading = listOf(state.transport.indicator(), state.ecu.indicator()),
+                trailing = listOf(recordingIndicator())
             )
             Spacer(modifier = Modifier.weight(1f))
             PrimaryReading(reading = state.reading(TelemetryMetric.ENGINE_RPM))

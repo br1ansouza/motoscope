@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -27,10 +28,26 @@ internal data class IndicatorState(
 )
 
 @Composable
-internal fun IndicatorRow(indicators: List<IndicatorState>, modifier: Modifier = Modifier) {
+internal fun IndicatorRow(
+    leading: List<IndicatorState>,
+    trailing: List<IndicatorState>,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.medium)
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IndicatorGroup(indicators = leading)
+        IndicatorGroup(indicators = trailing)
+    }
+}
+
+@Composable
+private fun IndicatorGroup(indicators: List<IndicatorState>) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.medium),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         indicators.forEach { Indicator(it) }
     }
