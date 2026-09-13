@@ -13,8 +13,11 @@ data class RecordingSession(
         require(endedAtEpochMillis == null || endedAtEpochMillis >= startedAtEpochMillis) {
             "Fim da sessão não pode anteceder o início."
         }
-        require((status == SessionStatus.RECORDING) == (endedAtEpochMillis == null)) {
-            "Sessão em $status é incompatível com fim $endedAtEpochMillis."
+        require(status != SessionStatus.RECORDING || endedAtEpochMillis == null) {
+            "Sessão em gravação não pode ter fim, recebido $endedAtEpochMillis."
+        }
+        require(status != SessionStatus.FINISHED || endedAtEpochMillis != null) {
+            "Sessão encerrada precisa de fim."
         }
     }
 }
