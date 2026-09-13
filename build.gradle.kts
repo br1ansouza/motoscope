@@ -7,7 +7,13 @@ tasks.register("quality") {
     group = "verification"
     description = "Compila debug/release e executa testes, lint, detekt e ktlint."
     dependsOn("detekt", "ktlintCheck")
-    listOf(":app", ":core:ui", ":core:database", ":feature:dashboard").forEach { module ->
+    listOf(
+        ":app",
+        ":core:ui",
+        ":core:database",
+        ":feature:dashboard",
+        ":feature:recording"
+    ).forEach { module ->
         dependsOn(
             "$module:assembleDebug",
             "$module:assembleRelease",

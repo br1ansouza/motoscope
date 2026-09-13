@@ -26,5 +26,6 @@ include(
     ":core:database",
     ":protocol:elm327",
     ":simulator",
-    ":feature:dashboard"
+    ":feature:dashboard",
+    ":feature:recording"
 )
