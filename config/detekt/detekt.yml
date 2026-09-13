@@ -9,4 +9,4 @@ style:
   UnusedPrivateMember:
     ignoreAnnotated: ['Preview']
   MagicNumber:
-    excludes: ['**/test/**', '**/ui/theme/**', '**/*.gradle.kts']
+    excludes: ['**/test/**', '**/ui/theme/**', '**/simulator/**', '**/*.gradle.kts']
