@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="recording_channel_name">Gravação de sessão</string>
+    <string name="recording_channel_description">Mantém a gravação ativa com a tela apagada.</string>
+    <string name="recording_notification_title">Gravando telemetria</string>
+    <string name="recording_notification_idle">Preparando gravação</string>
+    <plurals name="recording_notification_samples">
+        <item quantity="one">%1$d amostra gravada</item>
+        <item quantity="other">%1$d amostras gravadas</item>
+    </plurals>
+    <string name="recording_notification_stop">FINALIZAR</string>
+</resources>

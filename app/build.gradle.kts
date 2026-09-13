@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":core:settings"))
     implementation(project(":core:vehicle"))
     implementation(project(":feature:dashboard"))
+    implementation(project(":feature:recording"))
     implementation(project(":simulator"))
     implementation(project(":core:database"))
     implementation(libs.androidx.activity.compose)
