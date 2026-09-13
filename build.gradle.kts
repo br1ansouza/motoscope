@@ -18,4 +18,12 @@ tasks.register("quality") {
             "$module:ktlintCheck"
         )
     }
+    listOf(":core:model").forEach { module ->
+        dependsOn(
+            "$module:assemble",
+            "$module:test",
+            "$module:detekt",
+            "$module:ktlintCheck"
+        )
+    }
 }
