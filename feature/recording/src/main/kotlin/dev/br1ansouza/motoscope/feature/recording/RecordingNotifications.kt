@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import dev.br1ansouza.motoscope.core.recording.RecordingState
 import javax.inject.Inject
 
 internal class RecordingNotifications @Inject constructor(private val context: Context) {
@@ -24,10 +23,10 @@ internal class RecordingNotifications @Inject constructor(private val context: C
         manager.createNotificationChannel(channel)
     }
 
-    fun build(state: RecordingState, launchIntent: Intent?): Notification {
+    fun build(launchIntent: Intent?): Notification {
         val builder = Notification.Builder(context, CHANNEL_ID)
             .setContentTitle(context.getString(R.string.recording_notification_title))
-            .setContentText(summary(state))
+            .setContentText(context.getString(R.string.recording_notification_text))
             .setSmallIcon(android.R.drawable.presence_video_online)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
@@ -37,20 +36,6 @@ internal class RecordingNotifications @Inject constructor(private val context: C
             builder.setContentIntent(activityIntent(launchIntent))
         }
         return builder.build()
-    }
-
-    private fun summary(state: RecordingState): String = when (state) {
-        is RecordingState.Idle -> context.getString(R.string.recording_notification_idle)
-        is RecordingState.Active -> {
-            val total = (state.samplesWritten + state.samplesPending)
-                .coerceAtMost(Int.MAX_VALUE.toLong())
-                .toInt()
-            context.resources.getQuantityString(
-                R.plurals.recording_notification_samples,
-                total,
-                total
-            )
-        }
     }
 
     private fun stopAction(): Notification.Action = Notification.Action.Builder(

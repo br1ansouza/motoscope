@@ -7,13 +7,11 @@ import android.os.Build
 import android.os.IBinder
 import dagger.hilt.android.AndroidEntryPoint
 import dev.br1ansouza.motoscope.core.recording.RecordingEngine
-import dev.br1ansouza.motoscope.core.recording.RecordingState
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -25,7 +23,7 @@ class RecordingService : Service() {
     internal lateinit var notifications: RecordingNotifications
 
     private val scope = CoroutineScope(SupervisorJob())
-    private var stateJob: Job? = null
+    private var sessionJob: Job? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -44,29 +42,24 @@ class RecordingService : Service() {
     }
 
     private fun start() {
-        promote(engine.state.value)
-        if (stateJob != null) return
-        stateJob = scope.launch {
-            engine.start()
-            engine.state.collectLatest { state ->
-                if (state is RecordingState.Active) promote(state)
-            }
-        }
+        promote()
+        if (sessionJob != null) return
+        sessionJob = scope.launch { engine.start() }
     }
 
     private fun stop() {
         scope.launch {
             engine.stop()
-            stateJob?.cancel()
-            stateJob = null
+            sessionJob?.cancel()
+            sessionJob = null
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         }
     }
 
-    private fun promote(state: RecordingState) {
+    private fun promote() {
         val launch = packageManager.getLaunchIntentForPackage(packageName)
-        val notification = notifications.build(state, launch)
+        val notification = notifications.build(launch)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
                 RecordingNotifications.NOTIFICATION_ID,
