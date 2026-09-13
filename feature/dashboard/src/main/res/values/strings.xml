@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard_indicator_transport">BT</string>
+    <string name="dashboard_indicator_ecu">ECU</string>
+    <string name="dashboard_indicator_recording">REC</string>
+    <string name="dashboard_primary_label">RPM</string>
+    <string name="dashboard_engine_temperature">MOTOR</string>
+    <string name="dashboard_system_voltage">BATERIA</string>
+    <string name="dashboard_throttle">TPS</string>
+    <string name="dashboard_absent_value">—</string>
+    <string name="dashboard_simulated">Dados simulados. Nenhuma moto conectada.</string>
+    <string name="dashboard_transport_unavailable">indisponível</string>
+    <string name="dashboard_transport_disconnected">desconectado</string>
+    <string name="dashboard_transport_connecting">conectando</string>
+    <string name="dashboard_transport_connected">conectado</string>
+    <string name="dashboard_transport_reconnecting">reconectando</string>
+    <string name="dashboard_ecu_unknown">sem resposta ainda</string>
+    <string name="dashboard_ecu_not_responding">sem resposta</string>
+    <string name="dashboard_ecu_delayed">atrasada</string>
+    <string name="dashboard_ecu_responding">respondendo</string>
+    <string name="dashboard_recording_idle">parado</string>
+    <string name="dashboard_unit_celsius">°C</string>
+    <string name="dashboard_unit_volt">V</string>
+    <string name="dashboard_unit_percent">%</string>
+</resources>

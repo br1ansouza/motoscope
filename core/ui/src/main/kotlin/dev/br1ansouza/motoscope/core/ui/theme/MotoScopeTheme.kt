@@ -36,6 +36,12 @@ private val MotoScopeColors = darkColorScheme(
 )
 
 private val MotoScopeTypography = Typography(
+    displayLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Bold,
+        fontSize = 96.sp,
+        lineHeight = 100.sp
+    ),
     displaySmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Bold,
