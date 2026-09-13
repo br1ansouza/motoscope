@@ -4,8 +4,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import dev.br1ansouza.motoscope.core.recording.RecordingState
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopePalette
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
@@ -56,14 +58,14 @@ internal fun RecordingControl(
         },
         border = BorderStroke(MotoScopeSizes.fieldBorder, MotoScopePalette.gold)
     ) {
-        Row(
-            modifier = Modifier.padding(MotoScopeSpacing.medium),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.heightIn(min = 64.dp).padding(MotoScopeSpacing.small),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.labelLarge,
                 color = MotoScopePalette.ink,
                 textAlign = TextAlign.Center
             )

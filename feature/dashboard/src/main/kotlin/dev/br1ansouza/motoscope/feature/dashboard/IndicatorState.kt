@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import dev.br1ansouza.motoscope.core.model.EcuState
 import dev.br1ansouza.motoscope.core.model.TransportState
 import dev.br1ansouza.motoscope.core.recording.RecordingState
@@ -37,8 +39,37 @@ internal fun IndicatorRow(
     trailing: List<IndicatorState>,
     modifier: Modifier = Modifier
 ) {
+    val narrow = windowWidth() < NARROW_WIDTH
+    Box(modifier = modifier.fillMaxWidth()) {
+        if (narrow) {
+            Row(horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)) {
+                (leading + trailing).forEach { state ->
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(state.label),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = state.color
+                        )
+                        Text(
+                            text = stringResource(state.detail),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        } else {
+            WideIndicatorRow(leading, trailing)
+        }
+    }
+}
+
+private val NARROW_WIDTH = 600.dp
+
+@Composable
+private fun WideIndicatorRow(leading: List<IndicatorState>, trailing: List<IndicatorState>) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

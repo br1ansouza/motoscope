@@ -3,20 +3,19 @@ package dev.br1ansouza.motoscope.feature.dashboard
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
@@ -29,7 +28,7 @@ import dev.br1ansouza.motoscope.core.vehicle.EngineProfile
 
 @Composable
 internal fun RpmBar(fraction: Float, engine: EngineProfile, modifier: Modifier = Modifier) {
-    val level by animateFloatAsState(
+    val level = animateFloatAsState(
         targetValue = fraction.coerceIn(0f, 1f),
         animationSpec = tween(durationMillis = SWEEP_MILLIS, easing = LinearEasing),
         label = "rpm"
@@ -38,18 +37,16 @@ internal fun RpmBar(fraction: Float, engine: EngineProfile, modifier: Modifier =
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)
     ) {
-        Box(
+        Canvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(MotoScopeSizes.rpmBarHeight)
                 .background(MotoScopePalette.graphiteRaised)
                 .border(MotoScopeSizes.fieldBorder, MaterialTheme.colorScheme.outline)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(level)
-                    .background(sweepBrush(level, engine))
+            drawRect(
+                brush = sweepBrush(level.value, engine),
+                size = Size(size.width * level.value, size.height)
             )
         }
         Row(
@@ -62,12 +59,9 @@ internal fun RpmBar(fraction: Float, engine: EngineProfile, modifier: Modifier =
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = stringResource(
-                    R.string.dashboard_rpm_scale_percent,
-                    (level * PERCENT).toInt()
-                ),
+                text = stringResource(R.string.dashboard_primary_label),
                 style = MaterialTheme.typography.labelLarge,
-                color = levelColor(level, engine)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = MetricFormatting.integer(engine.scaleMaxRpm.toDouble()),
@@ -99,4 +93,3 @@ private fun levelColor(level: Float, engine: EngineProfile): Color {
 }
 
 private const val SWEEP_MILLIS = 90
-private const val PERCENT = 100
