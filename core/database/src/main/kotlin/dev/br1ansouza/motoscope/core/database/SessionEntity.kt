@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 internal data class SessionEntity(
     @PrimaryKey val id: String,
     val startedAtEpochMillis: Long,
-    val endedAtEpochMillis: Long? = null
+    val endedAtEpochMillis: Long? = null,
+    val status: String
 )
