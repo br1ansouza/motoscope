@@ -14,6 +14,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     lint {
+        lintConfig = rootProject.file("lint.xml")
         warningsAsErrors = true
         checkDependencies = true
     }

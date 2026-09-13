@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- A fundação usa um conjunto estável validado, sem perseguir a última versão.
+         Estes avisos continuam nos relatórios. Dependabot propõe atualizações para revisão.
+         SDK 35 é deliberado neste ciclo sem distribuição na Play Store. -->
+    <issue id="GradleDependency,AndroidGradlePluginVersion,OldTargetApi" severity="informational" />
+</lint>

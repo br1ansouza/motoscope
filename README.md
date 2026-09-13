@@ -45,3 +45,5 @@ O contexto local fica em `AGENTS.md` e `docs/README.md`, com decisões em `docs/
 ## Contribuir
 
 Use `feature/*`, `fix/*` ou `chore/*`, integre em `dev` e promova para `main` somente após `./gradlew quality` passar. Commits seguem Conventional Commits em português. Dependabot abre propostas semanais para `dev`; atualizações exigem revisão de compatibilidade e CI, sem merge automático. Mudanças em Kotlin/KSP, AGP/Gradle, Compose e processadores devem ser avaliadas em conjunto.
+
+O lint mantém recomendações de atualização de versões e target SDK como informações visíveis no relatório: este ciclo valida um conjunto estável, sem publicação na Play Store. Os demais warnings continuam bloqueando a verificação.
