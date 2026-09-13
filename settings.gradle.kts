@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "MotoScope"
-include(":app", ":core:ui", ":core:database")
+include(":app", ":core:model", ":core:ui", ":core:database")
