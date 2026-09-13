@@ -5,13 +5,13 @@ sealed interface ElmCommand {
 
     data class At(override val text: String) : ElmCommand {
         init {
-            require(text.startsWith("AT")) { "Comando AT precisa começar com AT, recebido $text." }
+            require(text in ALLOWED_ADAPTER_COMMANDS) { "Comando AT não autorizado pelo MVP." }
         }
     }
 
     data class ObdRequest(val mode: Int, val pid: Int?) : ElmCommand {
         init {
-            require(mode in BYTE_MIN..BYTE_MAX) { "Modo fora de faixa: $mode." }
+            require(mode in READ_ONLY_MODES) { "O MVP permite somente modos OBD de leitura." }
             require(pid == null || pid in BYTE_MIN..BYTE_MAX) { "PID fora de faixa: $pid." }
         }
 
@@ -37,3 +37,23 @@ sealed interface ElmCommand {
 }
 
 internal fun Int.toHexByte(): String = toString(HEX_RADIX).uppercase().padStart(2, '0')
+
+private val ALLOWED_ADAPTER_COMMANDS = setOf(
+    "ATZ", "ATE0", "ATL0", "ATS0", "ATH0", "ATH1", "ATSP0", "ATDP", "ATRV"
+)
+private const val CURRENT_DATA = 0x01
+private const val FREEZE_FRAME = 0x02
+private const val STORED_DTC = 0x03
+private const val MONITOR_RESULTS = 0x06
+private const val PENDING_DTC = 0x07
+private const val VEHICLE_INFORMATION = 0x09
+private const val PERMANENT_DTC = 0x0A
+private val READ_ONLY_MODES = setOf(
+    CURRENT_DATA,
+    FREEZE_FRAME,
+    STORED_DTC,
+    MONITOR_RESULTS,
+    PENDING_DTC,
+    VEHICLE_INFORMATION,
+    PERMANENT_DTC
+)

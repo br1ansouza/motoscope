@@ -8,14 +8,13 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
 import dev.br1ansouza.motoscope.feature.dashboard.DashboardActions
 import dev.br1ansouza.motoscope.feature.dashboard.DashboardScreen
-import dev.br1ansouza.motoscope.feature.dashboard.DashboardSettings
 import dev.br1ansouza.motoscope.feature.recording.RecordingService
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -41,20 +40,19 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             MotoScopeTheme {
-                val state by runtime.telemetry.collectAsState()
-                val recording by runtime.recording.state.collectAsState()
-                val metrics by runtime.visibleMetrics.collectAsState()
-                val layout by runtime.layout.collectAsState()
-                val vehicle by runtime.vehicle.collectAsState()
+                val startup by runtime.startup.collectAsStateWithLifecycle()
+                val ready = startup as? StartupState.Ready
+                if (ready == null) {
+                    StartupScreen(startup == StartupState.Failed, runtime::retryStartup)
+                    return@MotoScopeTheme
+                }
+                val state by runtime.telemetry.collectAsStateWithLifecycle()
+                val recording by runtime.recording.state.collectAsStateWithLifecycle()
                 val scope = rememberCoroutineScope()
                 DashboardScreen(
                     state = state,
                     recording = recording,
-                    settings = DashboardSettings(
-                        visibleMetrics = metrics,
-                        layout = layout,
-                        vehicle = vehicle
-                    ),
+                    settings = ready.settings,
                     actions = DashboardActions(
                         onToggleMetric = { metric, visible ->
                             scope.launch { runtime.setMetricVisible(metric, visible) }

@@ -1,7 +1,7 @@
 package dev.br1ansouza.motoscope.core.vehicle
 
 object VehicleCatalog {
-    private val J_SERIES_350 = EngineProfile(
+    private val UNVALIDATED_J_SERIES_350 = EngineProfile(
         displacementCc = 349,
         idleRpm = 1_050,
         torquePeakRpm = 4_000,
@@ -27,6 +27,6 @@ object VehicleCatalog {
     private fun j350(id: String, name: String) = VehicleProfile(
         id = VehicleId(id),
         displayName = name,
-        engine = J_SERIES_350
+        engine = UNVALIDATED_J_SERIES_350
     )
 }

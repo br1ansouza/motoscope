@@ -44,7 +44,7 @@ fun DashboardScreen(
     modifier: Modifier = Modifier
 ) {
     var menuOpen by rememberSaveable { mutableStateOf(false) }
-    val configurationEnabled = recording !is RecordingState.Active
+    val configurationEnabled = recording == RecordingState.Idle
     LaunchedEffect(configurationEnabled) {
         if (!configurationEnabled) menuOpen = false
     }
@@ -120,7 +120,7 @@ private fun DashboardControls(
     ) {
         MetricsButton(
             onClick = onToggleMenu,
-            enabled = recording !is RecordingState.Active
+            enabled = recording == RecordingState.Idle
         )
         RecordingControl(
             state = recording,

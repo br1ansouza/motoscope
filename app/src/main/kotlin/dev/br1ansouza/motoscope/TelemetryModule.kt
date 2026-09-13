@@ -44,8 +44,8 @@ internal object TelemetryModule {
     @Provides
     @Singleton
     fun provideWindow(): FreshnessWindow = FreshnessWindow(
-        delayedAfterMillis = DELAYED_AFTER_MILLIS,
-        absentAfterMillis = ABSENT_AFTER_MILLIS
+        delayedAfterMillis = SIMULATION_DELAYED_AFTER_MILLIS,
+        absentAfterMillis = SIMULATION_ABSENT_AFTER_MILLIS
     )
 
     @Provides
@@ -81,8 +81,8 @@ internal object TelemetryModule {
         )
     )
 
-    private const val DELAYED_AFTER_MILLIS = 1_500L
-    private const val ABSENT_AFTER_MILLIS = 4_000L
+    private const val SIMULATION_DELAYED_AFTER_MILLIS = 1_500L
+    private const val SIMULATION_ABSENT_AFTER_MILLIS = 4_000L
     private const val REFRESH_INTERVAL_MILLIS = 250L
     private const val BATCH_SIZE = 128
     private const val FLUSH_INTERVAL_MILLIS = 2_000L

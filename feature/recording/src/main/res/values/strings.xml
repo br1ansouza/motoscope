@@ -4,5 +4,7 @@
     <string name="recording_channel_description">Mantém a gravação ativa com a tela apagada.</string>
     <string name="recording_notification_title">Gravando telemetria</string>
     <string name="recording_notification_text">Sessão em andamento. Amostras sendo gravadas.</string>
-    <string name="recording_notification_stop">FINALIZAR</string>
+    <string name="recording_notification_stop">ABRIR PARA FINALIZAR</string>
+    <string name="recording_notification_failed">A gravação foi interrompida</string>
+    <string name="recording_notification_retry">Não foi possível salvar. Tente finalizar novamente no MotoScope.</string>
 </resources>

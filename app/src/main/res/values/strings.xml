@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MotoScope</string>
+    <string name="startup_tagline">SUA MOTO. CADA DETALHE.</string>
+    <string name="startup_loading">Preparando seu painel…</string>
+    <string name="startup_failed">Não foi possível abrir os dados locais. Tente novamente.</string>
+    <string name="startup_retry">Tentar novamente</string>
 </resources>

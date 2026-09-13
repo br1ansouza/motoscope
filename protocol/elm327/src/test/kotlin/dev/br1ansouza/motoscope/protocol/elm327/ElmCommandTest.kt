@@ -32,6 +32,18 @@ class ElmCommandTest {
     }
 
     @Test
+    fun writingClearingActuationAndCommandInjectionAreRejected() {
+        listOf(0x04, 0x08, 0x2E, 0x31).forEach { mode ->
+            assertThrows(IllegalArgumentException::class.java) {
+                ElmCommand.ObdRequest(mode, null)
+            }
+        }
+        listOf("ATZ\r04", "ATZ\n04", "ATSH7DF", "ATPP00ON").forEach { command ->
+            assertThrows(IllegalArgumentException::class.java) { ElmCommand.At(command) }
+        }
+    }
+
+    @Test
     fun initializationSilencesEchoBeforeAskingForTheProtocol() {
         val texts = ElmInitialization.DEFAULT.map { it.text }
 

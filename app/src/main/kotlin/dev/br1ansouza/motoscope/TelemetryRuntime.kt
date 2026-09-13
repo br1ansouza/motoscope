@@ -3,19 +3,27 @@ package dev.br1ansouza.motoscope
 import dev.br1ansouza.motoscope.core.model.TelemetryMetric
 import dev.br1ansouza.motoscope.core.recording.RecordingEngine
 import dev.br1ansouza.motoscope.core.settings.DashboardLayout
-import dev.br1ansouza.motoscope.core.settings.DashboardMetrics
 import dev.br1ansouza.motoscope.core.settings.DashboardPreferencesStore
 import dev.br1ansouza.motoscope.core.settings.MetricVisibilityStore
 import dev.br1ansouza.motoscope.core.telemetry.LiveTelemetry
 import dev.br1ansouza.motoscope.core.telemetry.TelemetryEngine
 import dev.br1ansouza.motoscope.core.telemetry.TelemetryHub
-import dev.br1ansouza.motoscope.core.vehicle.VehicleCatalog
 import dev.br1ansouza.motoscope.core.vehicle.VehicleProfile
+import dev.br1ansouza.motoscope.feature.dashboard.DashboardSettings
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -28,16 +36,41 @@ internal class TelemetryRuntime @Inject constructor(
     private val preferences: DashboardPreferencesStore,
     private val scope: CoroutineScope
 ) {
-    val visibleMetrics: StateFlow<Set<TelemetryMetric>> = metrics.visibleMetrics()
-        .stateIn(scope, SharingStarted.Eagerly, DashboardMetrics.DEFAULT_VISIBLE)
+    private val retry = MutableStateFlow(0)
 
-    val layout: StateFlow<DashboardLayout> = preferences.layout()
-        .stateIn(scope, SharingStarted.Eagerly, DashboardLayout.PRIMARY_TOP)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val startup: StateFlow<StartupState> = retry.flatMapLatest {
+        flow<StartupState> {
+            emit(StartupState.Loading)
+            recording.prepare()
+            emitAll(
+                combine(
+                    metrics.visibleMetrics(),
+                    preferences.layout(),
+                    preferences.vehicle()
+                ) { visible, layout, vehicle ->
+                    StartupState.Ready(DashboardSettings(visible, layout, vehicle))
+                }
+            )
+        }.catch { emit(StartupState.Failed) }
+    }.stateIn(
+        scope,
+        SharingStarted.WhileSubscribed(replayExpirationMillis = 0),
+        StartupState.Loading
+    )
 
-    val vehicle: StateFlow<VehicleProfile> = preferences.vehicle()
-        .stateIn(scope, SharingStarted.Eagerly, VehicleCatalog.DEFAULT)
+    @OptIn(FlowPreview::class)
     val telemetry: StateFlow<LiveTelemetry> = engine.state()
-        .stateIn(scope, SharingStarted.Eagerly, LiveTelemetry())
+        .sample(PRESENTATION_INTERVAL_MILLIS)
+        .stateIn(
+            scope,
+            SharingStarted.WhileSubscribed(replayExpirationMillis = 0),
+            LiveTelemetry(simulated = hub.isSimulated)
+        )
+
+    fun retryStartup() {
+        retry.value += 1
+    }
 
     suspend fun setMetricVisible(metric: TelemetryMetric, visible: Boolean) {
         metrics.setVisible(metric, visible)
@@ -56,3 +89,11 @@ internal class TelemetryRuntime @Inject constructor(
         scope.launch { hub.run() }
     }
 }
+
+internal sealed interface StartupState {
+    data object Loading : StartupState
+    data object Failed : StartupState
+    data class Ready(val settings: DashboardSettings) : StartupState
+}
+
+private const val PRESENTATION_INTERVAL_MILLIS = 100L

@@ -31,14 +31,14 @@ internal class SessionJournal(
     ) {
         val last = lastSampleMonotonicMillis ?: return
         if (gapOpen || clock.millis() - last < absentAfterMillis) return
-        gapOpen = true
         write(id, SessionEventType.DATA_GAP_STARTED)
+        gapOpen = true
     }
 
     suspend fun closeGap(id: SessionId) {
         if (!gapOpen) return
-        gapOpen = false
         write(id, SessionEventType.DATA_GAP_ENDED)
+        gapOpen = false
     }
 
     fun reset() {
