@@ -21,6 +21,7 @@ include(
     ":core:telemetry",
     ":core:recording",
     ":core:settings",
+    ":core:vehicle",
     ":core:ui",
     ":core:database",
     ":protocol:elm327",

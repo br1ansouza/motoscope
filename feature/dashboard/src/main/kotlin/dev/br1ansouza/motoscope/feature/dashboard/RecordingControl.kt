@@ -4,7 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -13,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -31,12 +33,20 @@ internal fun RecordingControl(
     modifier: Modifier = Modifier
 ) {
     val active = state is RecordingState.Active
+    val haptics = LocalHapticFeedback.current
+    val label = stringResource(
+        if (active) R.string.dashboard_stop_recording else R.string.dashboard_start_recording
+    )
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { if (!active) onStart() },
-                onLongClick = { if (active) onStop() }
+                onClick = {},
+                onLongClickLabel = label,
+                onLongClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    if (active) onStop() else onStart()
+                }
             ),
         shape = MaterialTheme.shapes.large,
         color = if (active) {
@@ -46,19 +56,13 @@ internal fun RecordingControl(
         },
         border = BorderStroke(MotoScopeSizes.fieldBorder, MotoScopePalette.gold)
     ) {
-        Column(
+        Row(
             modifier = Modifier.padding(MotoScopeSpacing.medium),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(
-                    if (active) {
-                        R.string.dashboard_stop_recording
-                    } else {
-                        R.string.dashboard_start_recording
-                    }
-                ),
+                text = label,
                 style = MaterialTheme.typography.titleMedium,
                 color = MotoScopePalette.ink,
                 textAlign = TextAlign.Center
@@ -74,7 +78,8 @@ internal fun RecordingControl(
                         total
                     ),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MotoScopePalette.gold
+                    color = MotoScopePalette.gold,
+                    modifier = Modifier.padding(start = MotoScopeSpacing.small)
                 )
             }
         }
