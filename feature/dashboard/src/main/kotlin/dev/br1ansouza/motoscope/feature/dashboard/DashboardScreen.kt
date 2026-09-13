@@ -1,23 +1,20 @@
 package dev.br1ansouza.motoscope.feature.dashboard
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import dev.br1ansouza.motoscope.core.model.EcuState
 import dev.br1ansouza.motoscope.core.model.Freshness
@@ -26,132 +23,82 @@ import dev.br1ansouza.motoscope.core.model.TelemetryMetric
 import dev.br1ansouza.motoscope.core.model.TelemetrySample
 import dev.br1ansouza.motoscope.core.model.TelemetrySource
 import dev.br1ansouza.motoscope.core.model.TransportState
+import dev.br1ansouza.motoscope.core.recording.RecordingState
 import dev.br1ansouza.motoscope.core.telemetry.LiveTelemetry
 import dev.br1ansouza.motoscope.core.telemetry.MetricReading
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
-import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeStatusColors
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
 
 @Composable
-fun DashboardScreen(state: LiveTelemetry, modifier: Modifier = Modifier) {
+fun DashboardScreen(
+    state: LiveTelemetry,
+    recording: RecordingState,
+    settings: DashboardSettings,
+    actions: DashboardActions,
+    modifier: Modifier = Modifier
+) {
+    var menuOpen by rememberSaveable { mutableStateOf(false) }
     Surface(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .safeDrawingPadding()
-                .padding(MotoScopeSpacing.large),
-            verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.large)
-        ) {
-            IndicatorRow(
-                indicators = listOf(
-                    state.transport.indicator(),
-                    state.ecu.indicator(),
-                    recordingIndicator()
+        Row(modifier = Modifier.safeDrawingPadding()) {
+            if (menuOpen) {
+                ConfigurationPanel(
+                    settings = settings,
+                    actions = actions,
+                    onClose = { menuOpen = false }
                 )
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            PrimaryReading(reading = state.reading(TelemetryMetric.ENGINE_RPM))
-            Spacer(modifier = Modifier.weight(1f))
-            SecondaryRow(state = state)
-            if (state.simulated) {
-                Text(
-                    text = stringResource(R.string.dashboard_simulated),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MotoScopeStatusColors.warning,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+            }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(MotoScopeSpacing.large),
+                verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
+            ) {
+                IndicatorRow(
+                    leading = listOf(state.transport.indicator(), state.ecu.indicator()),
+                    trailing = listOf(recording.indicator())
                 )
+                if (state.simulated) {
+                    SimulationNotice()
+                }
+                DashboardBody(
+                    state = state,
+                    settings = settings,
+                    modifier = Modifier.weight(1f)
+                )
+                Row(
+                    modifier = Modifier.height(IntrinsicSize.Min),
+                    horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
+                ) {
+                    MetricsButton(onClick = { menuOpen = !menuOpen })
+                    RecordingControl(
+                        state = recording,
+                        onStart = actions.onStartRecording,
+                        onStop = actions.onStopRecording,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }
-}
-
-@Composable
-private fun PrimaryReading(reading: MetricReading?) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = reading.display(),
-            style = MaterialTheme.typography.displayLarge,
-            color = reading.freshnessColor()
-        )
-        Text(
-            text = stringResource(R.string.dashboard_primary_label),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Composable
-private fun SecondaryRow(state: LiveTelemetry) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        SecondaryReading(
-            label = R.string.dashboard_engine_temperature,
-            unit = R.string.dashboard_unit_celsius,
-            reading = state.reading(TelemetryMetric.ENGINE_TEMPERATURE)
-        )
-        SecondaryReading(
-            label = R.string.dashboard_system_voltage,
-            unit = R.string.dashboard_unit_volt,
-            reading = state.reading(TelemetryMetric.SYSTEM_VOLTAGE)
-        )
-        SecondaryReading(
-            label = R.string.dashboard_throttle,
-            unit = R.string.dashboard_unit_percent,
-            reading = state.reading(TelemetryMetric.THROTTLE_POSITION)
-        )
-    }
-}
-
-@Composable
-private fun SecondaryReading(@StringRes label: Int, @StringRes unit: Int, reading: MetricReading?) {
-    Column(horizontalAlignment = Alignment.Start) {
-        Text(
-            text = stringResource(label),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Row(verticalAlignment = Alignment.Bottom) {
-            Text(
-                text = reading.display(),
-                style = MaterialTheme.typography.displaySmall,
-                color = reading.freshnessColor()
-            )
-            if (reading?.freshness != Freshness.ABSENT) {
-                Text(
-                    text = stringResource(unit),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = MotoScopeSpacing.tiny)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun MetricReading?.display(): String = if (this == null || freshness == Freshness.ABSENT) {
-    stringResource(R.string.dashboard_absent_value)
-} else {
-    MetricFormatting.format(sample.value, sample.unit)
-}
-
-private fun MetricReading?.freshnessColor(): Color = when (this?.freshness) {
-    null -> MotoScopeStatusColors.disabled
-    Freshness.FRESH -> MotoScopeStatusColors.ok
-    Freshness.DELAYED -> MotoScopeStatusColors.warning
-    Freshness.ABSENT -> MotoScopeStatusColors.disabled
 }
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 720)
 @Composable
 private fun DashboardScreenPreview() {
-    MotoScopeTheme { DashboardScreen(state = previewState()) }
+    MotoScopeTheme {
+        DashboardScreen(
+            state = previewState(),
+            recording = RecordingState.Idle,
+            settings = DashboardSettings(),
+            actions = DashboardActions(
+                onToggleMetric = { _, _ -> },
+                onSelectLayout = {},
+                onSelectVehicle = {},
+                onStartRecording = {},
+                onStopRecording = {}
+            )
+        )
+    }
 }
 
 private fun previewState() = LiveTelemetry(

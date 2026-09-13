@@ -11,4 +11,11 @@ object MotoScopeSpacing {
 
 object MotoScopeSizes {
     val indicatorDot = 10.dp
+    val fieldBorder = 1.dp
+    val accentBar = 3.dp
+    val rpmBarHeight = 28.dp
+    val checkBox = 18.dp
+    val metricsButtonWidth = 88.dp
+    val metricsGlyph = 28.dp
+    val sidebarWidth = 320.dp
 }

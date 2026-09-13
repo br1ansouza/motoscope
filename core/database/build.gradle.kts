@@ -9,6 +9,8 @@ android { namespace = "dev.br1ansouza.motoscope.core.database" }
 room { schemaDirectory("$projectDir/schemas") }
 
 dependencies {
+    implementation(project(":core:recording"))
+    implementation(project(":core:settings"))
     implementation(libs.room.runtime)
     implementation(libs.coroutines.core)
     implementation(libs.hilt.android)

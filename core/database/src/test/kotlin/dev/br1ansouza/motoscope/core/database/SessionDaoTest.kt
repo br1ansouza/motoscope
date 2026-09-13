@@ -39,8 +39,8 @@ class SessionDaoTest {
     @Test
     fun sessionsAreObservedNewestFirst() = runTest {
         val dao = database.sessionDao()
-        dao.insert(SessionEntity("older", 100))
-        dao.insert(SessionEntity("newer", 200))
+        dao.insert(SessionEntity("older", 100, status = RECORDING))
+        dao.insert(SessionEntity("newer", 200, status = RECORDING))
 
         assertEquals(listOf("newer", "older"), dao.observeSessions().first().map { it.id })
     }
@@ -48,21 +48,21 @@ class SessionDaoTest {
     @Test
     fun finishingKeepsSessionAndExcludesItFromRecovery() = runTest {
         val dao = database.sessionDao()
-        dao.insert(SessionEntity("session", 100))
+        dao.insert(SessionEntity("session", 100, status = RECORDING))
 
-        assertEquals(1, dao.finish("session", 200))
+        assertEquals(1, dao.finish("session", 200, FINISHED))
         assertTrue(dao.findUnfinished().isEmpty())
         assertEquals(200L, dao.observeSessions().first().single().endedAtEpochMillis)
-        assertEquals(0, dao.finish("session", 300))
+        assertEquals(0, dao.finish("session", 300, FINISHED))
     }
 
     @Test
     fun finishRejectsUnknownSessionAndEndBeforeStart() = runTest {
         val dao = database.sessionDao()
-        dao.insert(SessionEntity("session", 100))
+        dao.insert(SessionEntity("session", 100, status = RECORDING))
 
-        assertEquals(0, dao.finish("missing", 200))
-        assertEquals(0, dao.finish("session", 99))
+        assertEquals(0, dao.finish("missing", 200, FINISHED))
+        assertEquals(0, dao.finish("session", 99, FINISHED))
         assertEquals(listOf("session"), dao.findUnfinished().map { it.id })
     }
 
@@ -71,15 +71,20 @@ class SessionDaoTest {
         database.close()
         database =
             Room.databaseBuilder(context, MotoScopeDatabase::class.java, "recovery-test.db").build()
-        database.sessionDao().insert(SessionEntity("interrupted", 100))
+        database.sessionDao().insert(SessionEntity("interrupted", 100, status = RECORDING))
         database.close()
 
         database =
             Room.databaseBuilder(context, MotoScopeDatabase::class.java, "recovery-test.db").build()
 
         assertEquals(
-            listOf(SessionEntity("interrupted", 100)),
+            listOf(SessionEntity("interrupted", 100, status = RECORDING)),
             database.sessionDao().findUnfinished()
         )
+    }
+
+    private companion object {
+        const val RECORDING = "RECORDING"
+        const val FINISHED = "FINISHED"
     }
 }

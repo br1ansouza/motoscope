@@ -80,6 +80,16 @@ class SimulatedTelemetryFeed(
                 TelemetryMetric.VEHICLE_SPEED,
                 throttle * SPEED_SPAN,
                 MetricUnit.KILOMETER_PER_HOUR
+            ),
+            sample(
+                TelemetryMetric.CALCULATED_ENGINE_LOAD,
+                (IDLE_LOAD_PERCENT + throttle * LOAD_SPAN).coerceAtMost(PERCENT_SPAN),
+                MetricUnit.PERCENT
+            ),
+            sample(
+                TelemetryMetric.INTAKE_MANIFOLD_PRESSURE,
+                IDLE_MANIFOLD_KPA + throttle * MANIFOLD_SPAN,
+                MetricUnit.KILOPASCAL
             )
         )
     }
@@ -107,11 +117,11 @@ class SimulatedTelemetryFeed(
     )
 
     private companion object {
-        const val FAST_INTERVAL_MILLIS = 120L
+        const val FAST_INTERVAL_MILLIS = 40L
         const val CONNECT_DELAY_MILLIS = 900L
         const val ECU_DELAY_MILLIS = 600L
         const val MILLIS_IN_SECOND = 1000.0
-        const val SLOW_EVERY_TICKS = 8L
+        const val SLOW_EVERY_TICKS = 24L
         const val TAU = 2 * Math.PI
 
         const val IDLE_RPM = 1250.0
@@ -123,6 +133,11 @@ class SimulatedTelemetryFeed(
         const val AMBIENT_CELSIUS = 27.0
         const val TEMPERATURE_SPAN = 68.0
         const val WARMUP_TAU_SECONDS = 70.0
+
+        const val IDLE_LOAD_PERCENT = 14.0
+        const val LOAD_SPAN = 82.0
+        const val IDLE_MANIFOLD_KPA = 32.0
+        const val MANIFOLD_SPAN = 66.0
 
         const val RESTING_VOLTS = 12.4
         const val CHARGING_VOLT_SPAN = 1.8
