@@ -17,4 +17,5 @@ object MotoScopeSizes {
     val checkBox = 18.dp
     val metricsButtonWidth = 88.dp
     val metricsGlyph = 28.dp
+    val sidebarWidth = 320.dp
 }

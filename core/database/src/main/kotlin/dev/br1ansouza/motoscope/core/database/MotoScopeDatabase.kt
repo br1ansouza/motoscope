@@ -8,9 +8,10 @@ import androidx.room.RoomDatabase
         SessionEntity::class,
         SampleEntity::class,
         SessionEventEntity::class,
-        MetricPreferenceEntity::class
+        MetricPreferenceEntity::class,
+        AppPreferenceEntity::class
     ],
-    version = SCHEMA_V3,
+    version = SCHEMA_V4,
     exportSchema = true
 )
 internal abstract class MotoScopeDatabase : RoomDatabase() {
@@ -21,4 +22,6 @@ internal abstract class MotoScopeDatabase : RoomDatabase() {
     abstract fun sessionEventDao(): SessionEventDao
 
     abstract fun metricPreferenceDao(): MetricPreferenceDao
+
+    abstract fun appPreferenceDao(): AppPreferenceDao
 }

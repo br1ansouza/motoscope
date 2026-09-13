@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
 import dev.br1ansouza.motoscope.feature.dashboard.DashboardActions
 import dev.br1ansouza.motoscope.feature.dashboard.DashboardScreen
+import dev.br1ansouza.motoscope.feature.dashboard.DashboardSettings
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -31,15 +32,23 @@ class MainActivity : ComponentActivity() {
                 val state by runtime.telemetry.collectAsState()
                 val recording by runtime.recording.state.collectAsState()
                 val metrics by runtime.visibleMetrics.collectAsState()
+                val layout by runtime.layout.collectAsState()
+                val vehicle by runtime.vehicle.collectAsState()
                 val scope = rememberCoroutineScope()
                 DashboardScreen(
                     state = state,
                     recording = recording,
-                    visibleMetrics = metrics,
+                    settings = DashboardSettings(
+                        visibleMetrics = metrics,
+                        layout = layout,
+                        vehicle = vehicle
+                    ),
                     actions = DashboardActions(
                         onToggleMetric = { metric, visible ->
                             scope.launch { runtime.setMetricVisible(metric, visible) }
                         },
+                        onSelectLayout = { scope.launch { runtime.setLayout(it) } },
+                        onSelectVehicle = { scope.launch { runtime.setVehicle(it) } },
                         onStartRecording = { scope.launch { runtime.recording.start() } },
                         onStopRecording = { scope.launch { runtime.recording.stop() } }
                     )

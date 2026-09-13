@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":core:telemetry"))
     implementation(project(":core:recording"))
     implementation(project(":core:settings"))
+    implementation(project(":core:vehicle"))
     implementation(project(":feature:dashboard"))
     implementation(project(":simulator"))
     implementation(project(":core:database"))

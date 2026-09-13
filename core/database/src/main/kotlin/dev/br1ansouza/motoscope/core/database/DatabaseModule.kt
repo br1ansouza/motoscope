@@ -9,6 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.br1ansouza.motoscope.core.recording.RecordingStore
+import dev.br1ansouza.motoscope.core.settings.DashboardPreferencesStore
 import dev.br1ansouza.motoscope.core.settings.MetricVisibilityStore
 import javax.inject.Singleton
 
@@ -19,7 +20,7 @@ internal object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): MotoScopeDatabase =
         Room.databaseBuilder(context, MotoScopeDatabase::class.java, "motoscope.db")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .build()
 
     @Provides
@@ -35,6 +36,10 @@ internal object DatabaseModule {
     @Provides
     fun provideMetricPreferenceDao(database: MotoScopeDatabase): MetricPreferenceDao =
         database.metricPreferenceDao()
+
+    @Provides
+    fun provideAppPreferenceDao(database: MotoScopeDatabase): AppPreferenceDao =
+        database.appPreferenceDao()
 }
 
 @Module
@@ -45,4 +50,9 @@ internal abstract class RecordingStoreModule {
 
     @Binds
     abstract fun bindMetricVisibilityStore(store: RoomMetricVisibilityStore): MetricVisibilityStore
+
+    @Binds
+    abstract fun bindDashboardPreferencesStore(
+        store: RoomDashboardPreferencesStore
+    ): DashboardPreferencesStore
 }

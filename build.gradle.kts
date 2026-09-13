@@ -23,6 +23,7 @@ tasks.register("quality") {
         ":core:telemetry",
         ":core:recording",
         ":core:settings",
+        ":core:vehicle",
         ":protocol:elm327",
         ":simulator"
     ).forEach { module ->

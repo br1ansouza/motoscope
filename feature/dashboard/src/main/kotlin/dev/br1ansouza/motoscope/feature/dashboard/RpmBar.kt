@@ -25,14 +25,12 @@ import dev.br1ansouza.motoscope.core.ui.theme.MotoScopePalette
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeRpmColors
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
-
-internal const val RPM_SCALE_MAX = 7_000.0
+import dev.br1ansouza.motoscope.core.vehicle.EngineProfile
 
 @Composable
-internal fun RpmBar(fraction: Float, modifier: Modifier = Modifier) {
-    val target = fraction.coerceIn(0f, 1f)
+internal fun RpmBar(fraction: Float, engine: EngineProfile, modifier: Modifier = Modifier) {
     val level by animateFloatAsState(
-        targetValue = target,
+        targetValue = fraction.coerceIn(0f, 1f),
         animationSpec = tween(durationMillis = SWEEP_MILLIS, easing = LinearEasing),
         label = "rpm"
     )
@@ -51,7 +49,7 @@ internal fun RpmBar(fraction: Float, modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth(level)
-                    .background(sweepBrush(level))
+                    .background(sweepBrush(level, engine))
             )
         }
         Row(
@@ -69,10 +67,10 @@ internal fun RpmBar(fraction: Float, modifier: Modifier = Modifier) {
                     (level * PERCENT).toInt()
                 ),
                 style = MaterialTheme.typography.labelLarge,
-                color = levelColor(level)
+                color = levelColor(level, engine)
             )
             Text(
-                text = MetricFormatting.integer(RPM_SCALE_MAX),
+                text = MetricFormatting.integer(engine.scaleMaxRpm.toDouble()),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -80,23 +78,25 @@ internal fun RpmBar(fraction: Float, modifier: Modifier = Modifier) {
     }
 }
 
-private fun sweepBrush(level: Float): Brush = Brush.horizontalGradient(
-    colors = listOf(levelColor(0f), levelColor(level))
+private fun sweepBrush(level: Float, engine: EngineProfile): Brush = Brush.horizontalGradient(
+    colors = listOf(levelColor(0f, engine), levelColor(level, engine))
 )
 
-private fun levelColor(level: Float): Color {
-    val clamped = level.coerceIn(0f, 1f)
-    return if (clamped <= MIDPOINT) {
-        lerp(MotoScopeRpmColors.calm, MotoScopeRpmColors.gold, clamped / MIDPOINT)
-    } else {
-        lerp(
+private fun levelColor(level: Float, engine: EngineProfile): Color {
+    val rpm = level.coerceIn(0f, 1f) * engine.scaleMaxRpm
+    val torque = engine.torquePeakRpm.toFloat()
+    val power = engine.powerPeakRpm.toFloat()
+    val ceiling = engine.scaleMaxRpm.toFloat()
+    return when {
+        rpm <= torque -> lerp(MotoScopeRpmColors.calm, MotoScopeRpmColors.gold, rpm / torque)
+        rpm <= power -> MotoScopeRpmColors.gold
+        else -> lerp(
             MotoScopeRpmColors.gold,
             MotoScopeRpmColors.redline,
-            (clamped - MIDPOINT) / (1f - MIDPOINT)
+            ((rpm - power) / (ceiling - power)).coerceIn(0f, 1f)
         )
     }
 }
 
-private const val MIDPOINT = 0.55f
 private const val SWEEP_MILLIS = 90
 private const val PERCENT = 100
