@@ -46,7 +46,10 @@ internal class RecordingSessionWriter(
         if (session != null) return true
         val previous = store.findUnfinished().lastOrNull()
         if (previous != null) {
-            samplesWritten = store.resumeSession(previous.id, event(SessionEventType.RECORDING_RESUMED))
+            samplesWritten = store.resumeSession(
+                previous.id,
+                event(SessionEventType.RECORDING_RESUMED)
+            )
             session = previous.copy(status = SessionStatus.RECORDING)
             lastSampleMonotonicMillis = clock.millis()
         }
