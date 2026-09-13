@@ -14,25 +14,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 private val MotoScopeColors = darkColorScheme(
-    primary = Color(0xFFD4B574),
-    onPrimary = Color(0xFF211B0C),
-    primaryContainer = Color(0xFF722B35),
-    onPrimaryContainer = Color(0xFFFFDADD),
-    secondary = Color(0xFFE5A4AC),
-    onSecondary = Color(0xFF421920),
-    secondaryContainer = Color(0xFF5C252E),
-    onSecondaryContainer = Color(0xFFFFDADD),
-    tertiary = Color(0xFFB8CBA6),
-    onTertiary = Color(0xFF24341B),
-    background = Color(0xFF101113),
-    onBackground = Color(0xFFF3F0EB),
-    surface = Color(0xFF101113),
-    onSurface = Color(0xFFF3F0EB),
-    surfaceVariant = Color(0xFF25262B),
-    onSurfaceVariant = Color(0xFFC7C5C0),
-    outline = Color(0xFF96948F),
-    error = Color(0xFFFFB4AB),
-    onError = Color(0xFF690005)
+    primary = MotoScopePalette.darkRed,
+    onPrimary = MotoScopePalette.ink,
+    primaryContainer = MotoScopePalette.darkRedRaised,
+    onPrimaryContainer = MotoScopePalette.ink,
+    secondary = MotoScopePalette.gold,
+    onSecondary = MotoScopePalette.black,
+    secondaryContainer = MotoScopePalette.graphiteRaised,
+    onSecondaryContainer = MotoScopePalette.gold,
+    tertiary = MotoScopePalette.gold,
+    onTertiary = MotoScopePalette.black,
+    background = MotoScopePalette.black,
+    onBackground = MotoScopePalette.ink,
+    surface = MotoScopePalette.graphite,
+    onSurface = MotoScopePalette.ink,
+    surfaceVariant = MotoScopePalette.graphiteRaised,
+    onSurfaceVariant = Color(0xFFA9ACB2),
+    outline = MotoScopePalette.edge,
+    error = MotoScopeStatusColors.failure,
+    onError = MotoScopePalette.ink
 )
 
 private val MotoScopeTypography = Typography(
@@ -68,9 +68,9 @@ private val MotoScopeTypography = Typography(
 )
 
 private val MotoScopeShapes = Shapes(
-    small = RoundedCornerShape(4.dp),
-    medium = RoundedCornerShape(8.dp),
-    large = RoundedCornerShape(12.dp)
+    small = RoundedCornerShape(0.dp),
+    medium = RoundedCornerShape(0.dp),
+    large = RoundedCornerShape(0.dp)
 )
 
 @Composable

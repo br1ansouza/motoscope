@@ -1,10 +1,10 @@
 package dev.br1ansouza.motoscope.feature.dashboard
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,6 +29,8 @@ import dev.br1ansouza.motoscope.core.model.TransportState
 import dev.br1ansouza.motoscope.core.recording.RecordingState
 import dev.br1ansouza.motoscope.core.telemetry.LiveTelemetry
 import dev.br1ansouza.motoscope.core.telemetry.MetricReading
+import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeReadingColors
+import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeStatusColors
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
@@ -46,7 +48,7 @@ fun DashboardScreen(
             modifier = Modifier
                 .safeDrawingPadding()
                 .padding(MotoScopeSpacing.large),
-            verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.large)
+            verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
         ) {
             IndicatorRow(
                 leading = listOf(state.transport.indicator(), state.ecu.indicator()),
@@ -57,13 +59,17 @@ fun DashboardScreen(
                     text = stringResource(R.string.dashboard_simulated),
                     style = MaterialTheme.typography.labelLarge,
                     color = MotoScopeStatusColors.warning,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(MotoScopeSizes.fieldBorder, MotoScopeStatusColors.warning)
+                        .padding(MotoScopeSpacing.tiny),
                     textAlign = TextAlign.Center
                 )
             }
-            Spacer(modifier = Modifier.weight(1f))
-            PrimaryReading(reading = state.reading(TelemetryMetric.ENGINE_RPM))
-            Spacer(modifier = Modifier.weight(1f))
+            PrimaryReading(
+                reading = state.reading(TelemetryMetric.ENGINE_RPM),
+                modifier = Modifier.weight(1f)
+            )
             SecondaryRow(state = state)
             RecordingControl(
                 state = recording,
@@ -75,71 +81,74 @@ fun DashboardScreen(
 }
 
 @Composable
-private fun PrimaryReading(reading: MetricReading?) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+private fun PrimaryReading(reading: MetricReading?, modifier: Modifier = Modifier) {
+    Field(
+        label = R.string.dashboard_primary_label,
+        modifier = modifier.fillMaxWidth(),
+        fillHeight = true
     ) {
-        Text(
-            text = reading.display(),
-            style = MaterialTheme.typography.displayLarge,
-            color = reading.freshnessColor()
-        )
-        Text(
-            text = stringResource(R.string.dashboard_primary_label),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.medium)
+        ) {
+            FieldValue(
+                value = reading.display(),
+                unit = null,
+                color = reading.freshnessColor(),
+                large = true
+            )
+            RpmBar(fraction = reading.rpmFraction())
+        }
     }
+}
+
+private fun MetricReading?.rpmFraction(): Float {
+    if (this == null || freshness == Freshness.ABSENT) return 0f
+    return (sample.value / RPM_SCALE_MAX).toFloat()
 }
 
 @Composable
 private fun SecondaryRow(state: LiveTelemetry) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
     ) {
         SecondaryReading(
             label = R.string.dashboard_engine_temperature,
             unit = R.string.dashboard_unit_celsius,
-            reading = state.reading(TelemetryMetric.ENGINE_TEMPERATURE)
+            reading = state.reading(TelemetryMetric.ENGINE_TEMPERATURE),
+            modifier = Modifier.weight(1f)
         )
         SecondaryReading(
             label = R.string.dashboard_system_voltage,
             unit = R.string.dashboard_unit_volt,
-            reading = state.reading(TelemetryMetric.SYSTEM_VOLTAGE)
+            reading = state.reading(TelemetryMetric.SYSTEM_VOLTAGE),
+            modifier = Modifier.weight(1f)
         )
         SecondaryReading(
             label = R.string.dashboard_throttle,
             unit = R.string.dashboard_unit_percent,
-            reading = state.reading(TelemetryMetric.THROTTLE_POSITION)
+            reading = state.reading(TelemetryMetric.THROTTLE_POSITION),
+            modifier = Modifier.weight(1f)
         )
     }
 }
 
 @Composable
-private fun SecondaryReading(@StringRes label: Int, @StringRes unit: Int, reading: MetricReading?) {
-    Column(horizontalAlignment = Alignment.Start) {
-        Text(
-            text = stringResource(label),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+private fun SecondaryReading(
+    @StringRes label: Int,
+    @StringRes unit: Int,
+    reading: MetricReading?,
+    modifier: Modifier = Modifier
+) {
+    Field(label = label, modifier = modifier) {
+        FieldValue(
+            value = reading.display(),
+            unit = if (reading?.freshness == Freshness.ABSENT) null else stringResource(unit),
+            color = reading.freshnessColor(),
+            large = false
         )
-        Row(verticalAlignment = Alignment.Bottom) {
-            Text(
-                text = reading.display(),
-                style = MaterialTheme.typography.displaySmall,
-                color = reading.freshnessColor()
-            )
-            if (reading?.freshness != Freshness.ABSENT) {
-                Text(
-                    text = stringResource(unit),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = MotoScopeSpacing.tiny)
-                )
-            }
-        }
     }
 }
 
@@ -151,10 +160,10 @@ private fun MetricReading?.display(): String = if (this == null || freshness == 
 }
 
 private fun MetricReading?.freshnessColor(): Color = when (this?.freshness) {
-    null -> MotoScopeStatusColors.disabled
-    Freshness.FRESH -> MotoScopeStatusColors.ok
-    Freshness.DELAYED -> MotoScopeStatusColors.warning
-    Freshness.ABSENT -> MotoScopeStatusColors.disabled
+    null -> MotoScopeReadingColors.absent
+    Freshness.FRESH -> MotoScopeReadingColors.fresh
+    Freshness.DELAYED -> MotoScopeReadingColors.delayed
+    Freshness.ABSENT -> MotoScopeReadingColors.absent
 }
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 720)

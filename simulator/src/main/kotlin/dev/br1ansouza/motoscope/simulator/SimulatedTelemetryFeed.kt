@@ -107,11 +107,11 @@ class SimulatedTelemetryFeed(
     )
 
     private companion object {
-        const val FAST_INTERVAL_MILLIS = 120L
+        const val FAST_INTERVAL_MILLIS = 40L
         const val CONNECT_DELAY_MILLIS = 900L
         const val ECU_DELAY_MILLIS = 600L
         const val MILLIS_IN_SECOND = 1000.0
-        const val SLOW_EVERY_TICKS = 8L
+        const val SLOW_EVERY_TICKS = 24L
         const val TAU = 2 * Math.PI
 
         const val IDLE_RPM = 1250.0

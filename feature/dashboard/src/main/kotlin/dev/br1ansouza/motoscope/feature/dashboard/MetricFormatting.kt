@@ -15,6 +15,8 @@ internal object MetricFormatting {
         maximumFractionDigits = 1
     }
 
+    fun integer(value: Double): String = whole.format(value.roundToInt())
+
     fun format(value: Double, unit: MetricUnit): String = when (unit) {
         MetricUnit.VOLT -> oneDecimal.format(value)
         else -> whole.format(value.roundToInt())

@@ -2,22 +2,25 @@ package dev.br1ansouza.motoscope.feature.dashboard
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import dev.br1ansouza.motoscope.core.model.EcuState
 import dev.br1ansouza.motoscope.core.model.TransportState
 import dev.br1ansouza.motoscope.core.recording.RecordingState
+import dev.br1ansouza.motoscope.core.ui.theme.MotoScopePalette
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeStatusColors
@@ -57,18 +60,25 @@ private fun IndicatorGroup(indicators: List<IndicatorState>) {
 @Composable
 private fun Indicator(state: IndicatorState) {
     Row(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .border(MotoScopeSizes.fieldBorder, MaterialTheme.colorScheme.outline)
+            .padding(
+                horizontal = MotoScopeSpacing.small,
+                vertical = MotoScopeSpacing.tiny
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)
     ) {
         Box(
             modifier = Modifier
                 .size(MotoScopeSizes.indicatorDot)
-                .background(state.color, CircleShape)
+                .background(state.color, RectangleShape)
         )
         Text(
             text = stringResource(state.label),
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MotoScopePalette.gold
         )
         Text(
             text = stringResource(state.detail),

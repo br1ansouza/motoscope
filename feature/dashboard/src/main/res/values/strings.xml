@@ -8,6 +8,8 @@
     <string name="dashboard_system_voltage">BATERIA</string>
     <string name="dashboard_throttle">TPS</string>
     <string name="dashboard_absent_value">—</string>
+    <string name="dashboard_rpm_scale_min">0</string>
+    <string name="dashboard_rpm_scale_percent">%1$d%%</string>
     <string name="dashboard_simulated">Dados simulados. Nenhuma moto conectada.</string>
     <string name="dashboard_transport_unavailable">indisponível</string>
     <string name="dashboard_transport_disconnected">desconectado</string>
