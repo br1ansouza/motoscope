@@ -20,6 +20,7 @@ include(
     ":core:model",
     ":core:telemetry",
     ":core:recording",
+    ":core:settings",
     ":core:ui",
     ":core:database",
     ":protocol:elm327",

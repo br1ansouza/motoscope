@@ -22,6 +22,7 @@ tasks.register("quality") {
         ":core:model",
         ":core:telemetry",
         ":core:recording",
+        ":core:settings",
         ":protocol:elm327",
         ":simulator"
     ).forEach { module ->

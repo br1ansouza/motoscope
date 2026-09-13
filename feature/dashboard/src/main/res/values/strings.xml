@@ -28,6 +28,14 @@
         <item quantity="one">%1$d amostra</item>
         <item quantity="other">%1$d amostras</item>
     </plurals>
+    <string name="dashboard_vehicle_speed">VELOCIDADE</string>
+    <string name="dashboard_engine_load">CARGA</string>
+    <string name="dashboard_manifold_pressure">COLETOR</string>
+    <string name="dashboard_metrics_title">MÉTRICAS NO PAINEL</string>
+    <string name="dashboard_metrics_open">MÉTRICAS</string>
+    <string name="dashboard_metrics_close">FECHAR</string>
+    <string name="dashboard_unit_kmh">km/h</string>
+    <string name="dashboard_unit_kpa">kPa</string>
     <string name="dashboard_unit_celsius">°C</string>
     <string name="dashboard_unit_volt">V</string>
     <string name="dashboard_unit_percent">%</string>
