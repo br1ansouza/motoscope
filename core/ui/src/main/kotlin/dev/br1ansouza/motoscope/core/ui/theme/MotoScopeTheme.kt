@@ -40,13 +40,16 @@ private val MotoScopeTypography = Typography(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Bold,
         fontSize = 96.sp,
-        lineHeight = 100.sp
+        lineHeight = 100.sp,
+        fontFeatureSettings = "tnum",
+        letterSpacing = (-2).sp
     ),
     displaySmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Bold,
         fontSize = 36.sp,
-        lineHeight = 44.sp
+        lineHeight = 44.sp,
+        fontFeatureSettings = "tnum"
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,

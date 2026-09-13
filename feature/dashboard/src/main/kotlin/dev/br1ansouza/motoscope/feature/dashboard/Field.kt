@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopePalette
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
@@ -67,27 +68,40 @@ internal fun FieldValue(
     color: androidx.compose.ui.graphics.Color,
     large: Boolean
 ) {
-    Row(verticalAlignment = Alignment.Bottom) {
+    val narrow = windowWidth() < NARROW_VALUE_WIDTH
+    val fullStyle = if (large) {
+        MaterialTheme.typography.displayLarge
+    } else {
+        MaterialTheme.typography.displaySmall
+    }
+    val baseStyle = if (narrow) {
+        fullStyle.copy(fontSize = fullStyle.fontSize * NARROW_VALUE_SCALE)
+    } else {
+        fullStyle
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
         Text(
             text = value,
-            style = if (large) {
-                MaterialTheme.typography.displayLarge
-            } else {
-                MaterialTheme.typography.displaySmall
-            },
+            style = baseStyle,
             color = color,
+            maxLines = 1,
+            softWrap = false,
             textAlign = TextAlign.Center
         )
         if (unit != null) {
             Text(
                 text = unit,
                 style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(
-                    start = MotoScopeSpacing.tiny,
-                    bottom = MotoScopeSpacing.tiny
-                )
+                modifier = Modifier.padding(start = MotoScopeSpacing.tiny)
             )
         }
     }
 }
+
+private val NARROW_VALUE_WIDTH = 600.dp
+private const val NARROW_VALUE_SCALE = 0.6f

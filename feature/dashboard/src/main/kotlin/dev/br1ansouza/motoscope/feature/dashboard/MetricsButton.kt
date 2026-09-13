@@ -23,13 +23,17 @@ import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
 
 @Composable
-internal fun MetricsButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun MetricsButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
     val label = stringResource(R.string.dashboard_metrics_open)
     Surface(
         modifier = modifier
             .width(MotoScopeSizes.metricsButtonWidth)
             .fillMaxHeight()
-            .clickable(onClickLabel = label) { onClick() }
+            .clickable(enabled = enabled, onClickLabel = label) { onClick() }
             .semantics { contentDescription = label },
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surface,

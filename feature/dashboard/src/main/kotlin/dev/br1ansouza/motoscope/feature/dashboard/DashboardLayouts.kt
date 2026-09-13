@@ -2,12 +2,15 @@ package dev.br1ansouza.motoscope.feature.dashboard
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import dev.br1ansouza.motoscope.core.model.Freshness
 import dev.br1ansouza.motoscope.core.model.TelemetryMetric
 import dev.br1ansouza.motoscope.core.settings.DashboardLayout
@@ -30,6 +34,36 @@ import dev.br1ansouza.motoscope.core.vehicle.EngineProfile
 
 @Composable
 internal fun DashboardBody(
+    state: LiveTelemetry,
+    settings: DashboardSettings,
+    modifier: Modifier = Modifier
+) {
+    val ordered = DashboardMetrics.SELECTABLE.filter { it in settings.visibleMetrics }
+    val engine = settings.vehicle.engine
+    val shortScreen = windowHeight() < SHORT_SCREEN_HEIGHT
+    Box(modifier = modifier) {
+        if (shortScreen && settings.layout != DashboardLayout.UNIFORM) {
+            Row(horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)) {
+                PrimaryReading(
+                    reading = state.reading(TelemetryMetric.ENGINE_RPM),
+                    engine = engine,
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    compact = true
+                )
+                if (ordered.isNotEmpty()) {
+                    Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                        MetricGrid(state = state, metrics = ordered, columns = 2)
+                    }
+                }
+            }
+        } else {
+            StandardDashboardBody(state, settings, Modifier.fillMaxWidth().fillMaxHeight())
+        }
+    }
+}
+
+@Composable
+private fun StandardDashboardBody(
     state: LiveTelemetry,
     settings: DashboardSettings,
     modifier: Modifier = Modifier
@@ -146,18 +180,23 @@ private fun PrimaryReading(
         modifier = modifier.fillMaxWidth(),
         fillHeight = true
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.medium)
-        ) {
-            FieldValue(
-                value = reading.display(),
-                unit = null,
-                color = reading.freshnessColor(),
-                large = !compact
-            )
-            RpmBar(fraction = reading.rpmFraction(engine), engine = engine)
+        run {
+            val showBar = !compact
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.medium)
+            ) {
+                FieldValue(
+                    value = reading.display(),
+                    unit = null,
+                    color = reading.freshnessColor(),
+                    large = !compact
+                )
+                if (showBar) {
+                    RpmBar(fraction = reading.rpmFraction(engine), engine = engine)
+                }
+            }
         }
     }
 }
@@ -168,10 +207,14 @@ private fun MetricReading?.rpmFraction(engine: EngineProfile): Float {
 }
 
 @Composable
-private fun MetricGrid(state: LiveTelemetry, metrics: List<TelemetryMetric>) {
+private fun MetricGrid(
+    state: LiveTelemetry,
+    metrics: List<TelemetryMetric>,
+    columns: Int = COLUMNS
+) {
     if (metrics.isEmpty()) return
     Column(verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)) {
-        metrics.chunked(COLUMNS).forEach { row ->
+        metrics.chunked(columns).forEach { row ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
@@ -183,7 +226,7 @@ private fun MetricGrid(state: LiveTelemetry, metrics: List<TelemetryMetric>) {
                         modifier = Modifier.weight(1f)
                     )
                 }
-                repeat(COLUMNS - row.size) {
+                repeat(columns - row.size) {
                     Spacer(modifier = Modifier.weight(1f))
                 }
             }
@@ -214,13 +257,13 @@ private fun MetricField(
 }
 
 @Composable
-private fun MetricReading?.display(): String = if (this == null || freshness == Freshness.ABSENT) {
+internal fun MetricReading?.display(): String = if (this == null || freshness == Freshness.ABSENT) {
     stringResource(R.string.dashboard_absent_value)
 } else {
     MetricFormatting.format(sample.value, sample.unit)
 }
 
-private fun MetricReading?.freshnessColor(): Color = when (this?.freshness) {
+internal fun MetricReading?.freshnessColor(): Color = when (this?.freshness) {
     null -> MotoScopeReadingColors.absent
     Freshness.FRESH -> MotoScopeReadingColors.fresh
     Freshness.DELAYED -> MotoScopeReadingColors.delayed
@@ -228,3 +271,5 @@ private fun MetricReading?.freshnessColor(): Color = when (this?.freshness) {
 }
 
 private const val COLUMNS = 3
+
+private val SHORT_SCREEN_HEIGHT = 300.dp
