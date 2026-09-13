@@ -1,0 +1,12 @@
+config:
+  validation: true
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+
+style:
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+  MagicNumber:
+    excludes: ['**/test/**', '**/ui/theme/**', '**/*.gradle.kts']

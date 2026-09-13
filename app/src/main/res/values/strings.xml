@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MotoScope</string>
+    <string name="development_status">Em desenvolvimento</string>
+    <string name="initial_focus">Royal Enfield Hunter 350</string>
+    <string name="foundation_message">O painel e a gravação de telemetria estão em preparação. A conexão com a moto ainda não está disponível.</string>
+    <string name="read_only_message">Somente leitura da ECU</string>
+</resources>

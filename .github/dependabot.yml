@@ -1,0 +1,40 @@
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: America/Sao_Paulo
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(deps): atualiza'
+    groups:
+      kotlin-ksp:
+        patterns: ['org.jetbrains.kotlin*', 'com.google.devtools.ksp*']
+      room:
+        patterns: ['androidx.room*']
+        update-types: [minor, patch]
+      hilt:
+        patterns: ['com.google.dagger*']
+        update-types: [minor, patch]
+      coroutines:
+        patterns: ['org.jetbrains.kotlinx:kotlinx-coroutines*']
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: America/Sao_Paulo
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: 'chore(ci): atualiza'
+    groups:
+      actions-compativeis:
+        patterns: ['*']
+        update-types: [minor, patch]
