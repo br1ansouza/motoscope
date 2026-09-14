@@ -28,6 +28,7 @@ include(
     ":protocol:elm327",
     ":simulator",
     ":feature:dashboard",
+    ":feature:diagnostics",
     ":feature:history",
     ":feature:recording"
 )

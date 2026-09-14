@@ -114,29 +114,12 @@ private fun ConfigurationSections(settings: DashboardSettings, actions: Dashboar
                 )
             }
         }
-        Section(R.string.dashboard_section_storage, expandedByDefault = false) {
-            Text(
-                text = stringResource(R.string.dashboard_storage_pending),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = MotoScopeSpacing.tiny)
-            )
-            Text(
-                text = stringResource(R.string.dashboard_open_history),
-                style = MaterialTheme.typography.labelLarge,
-                color = MotoScopePalette.gold,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(MotoScopeSizes.fieldBorder, MaterialTheme.colorScheme.outline)
-                    .clickable { actions.onOpenHistory() }
-                    .padding(MotoScopeSpacing.small)
-            )
-        }
+        StorageAndDiagnosticsSections(actions = actions)
     }
 }
 
 @Composable
-private fun Section(
+internal fun Section(
     @StringRes title: Int,
     expandedByDefault: Boolean,
     content: @Composable () -> Unit

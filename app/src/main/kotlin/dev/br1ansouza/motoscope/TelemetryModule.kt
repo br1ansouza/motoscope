@@ -14,6 +14,9 @@ import dev.br1ansouza.motoscope.core.telemetry.MonotonicClock
 import dev.br1ansouza.motoscope.core.telemetry.TelemetryEngine
 import dev.br1ansouza.motoscope.core.telemetry.TelemetryFeed
 import dev.br1ansouza.motoscope.core.telemetry.TelemetryHub
+import dev.br1ansouza.motoscope.protocol.elm327.ElmCommandQueue
+import dev.br1ansouza.motoscope.protocol.elm327.ElmTransport
+import dev.br1ansouza.motoscope.simulator.SimulatedElmTransport
 import dev.br1ansouza.motoscope.simulator.SimulatedTelemetryFeed
 import java.util.UUID
 import javax.inject.Singleton
@@ -81,6 +84,22 @@ internal object TelemetryModule {
         )
     )
 
+    @Provides
+    @Singleton
+    fun provideElmTransport(): ElmTransport = SimulatedElmTransport()
+
+    @Provides
+    @Singleton
+    fun provideCommandQueue(transport: ElmTransport): ElmCommandQueue = ElmCommandQueue(
+        transport = transport,
+        timeoutMillis = ELM_TIMEOUT_MILLIS,
+        maxAttempts = ELM_MAX_ATTEMPTS,
+        maxSearchingFrames = ELM_MAX_SEARCHING_FRAMES
+    )
+
+    private const val ELM_TIMEOUT_MILLIS = 2_000L
+    private const val ELM_MAX_ATTEMPTS = 3
+    private const val ELM_MAX_SEARCHING_FRAMES = 4
     private const val SIMULATION_DELAYED_AFTER_MILLIS = 1_500L
     private const val SIMULATION_ABSENT_AFTER_MILLIS = 4_000L
     private const val REFRESH_INTERVAL_MILLIS = 250L

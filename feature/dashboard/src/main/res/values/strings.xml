@@ -31,6 +31,9 @@
     <string name="dashboard_section_storage">ARMAZENAMENTO</string>
     <string name="dashboard_section_collapse">−</string>
     <string name="dashboard_section_expand">+</string>
+    <string name="dashboard_section_diagnostics">DIAGNÓSTICO</string>
+    <string name="dashboard_diagnostics_hint">Ferramenta técnica: inicialização do adaptador e descoberta de PIDs.</string>
+    <string name="dashboard_open_diagnostics">ABRIR DIAGNÓSTICO</string>
     <string name="dashboard_open_history">SESSÕES GRAVADAS</string>
     <string name="dashboard_storage_pending">Os registros ficam no armazenamento privado do aplicativo. A escolha de pasta entra com a exportação.</string>
     <string name="dashboard_layout_primary_top">RPM em cima, demais embaixo</string>
