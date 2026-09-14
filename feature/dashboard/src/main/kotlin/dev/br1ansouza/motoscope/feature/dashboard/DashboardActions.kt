@@ -10,5 +10,6 @@ data class DashboardActions(
     val onSelectVehicle: (VehicleProfile) -> Unit,
     val onStartRecording: () -> Unit,
     val onStopRecording: () -> Unit,
-    val onOpenHistory: () -> Unit
+    val onOpenHistory: () -> Unit,
+    val onOpenDiagnostics: () -> Unit
 )

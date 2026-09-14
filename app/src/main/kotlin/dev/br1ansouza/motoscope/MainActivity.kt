@@ -25,6 +25,8 @@ import dev.br1ansouza.motoscope.core.model.SessionId
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
 import dev.br1ansouza.motoscope.feature.dashboard.DashboardActions
 import dev.br1ansouza.motoscope.feature.dashboard.DashboardScreen
+import dev.br1ansouza.motoscope.feature.diagnostics.DiagnosticsActions
+import dev.br1ansouza.motoscope.feature.diagnostics.DiagnosticsScreen
 import dev.br1ansouza.motoscope.feature.history.ExportNotice
 import dev.br1ansouza.motoscope.feature.history.HistoryActions
 import dev.br1ansouza.motoscope.feature.history.HistoryScreen
@@ -46,6 +48,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     internal lateinit var history: HistoryRuntime
 
+    @Inject
+    internal lateinit var diagnostics: DiagnosticsRuntime
+
     private val notificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
@@ -63,6 +68,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MotoScopeTheme {
                 var historyOpen by rememberSaveable { mutableStateOf(false) }
+                var diagnosticsOpen by rememberSaveable { mutableStateOf(false) }
                 var openSessionId by rememberSaveable { mutableStateOf<String?>(null) }
                 val startup by runtime.startup.collectAsStateWithLifecycle()
                 val ready = startup as? StartupState.Ready
@@ -73,6 +79,10 @@ class MainActivity : ComponentActivity() {
                 val state by runtime.telemetry.collectAsStateWithLifecycle()
                 val recording by runtime.recording.state.collectAsStateWithLifecycle()
                 val scope = rememberCoroutineScope()
+                if (diagnosticsOpen) {
+                    DiagnosticsRoute(onClose = { diagnosticsOpen = false })
+                    return@MotoScopeTheme
+                }
                 if (historyOpen) {
                     HistoryRoute(
                         openSessionId = openSessionId,
@@ -100,11 +110,23 @@ class MainActivity : ComponentActivity() {
                             RecordingService.start(this@MainActivity)
                         },
                         onStopRecording = { RecordingService.stop(this@MainActivity) },
-                        onOpenHistory = { historyOpen = true }
+                        onOpenHistory = { historyOpen = true },
+                        onOpenDiagnostics = { diagnosticsOpen = true }
                     )
                 )
             }
         }
+    }
+
+    @Composable
+    private fun DiagnosticsRoute(onClose: () -> Unit) {
+        BackHandler(onBack = onClose)
+        val state by diagnostics.state.collectAsStateWithLifecycle()
+        DiagnosticsScreen(
+            state = state,
+            actions = DiagnosticsActions(onRun = diagnostics::run, onBack = onClose),
+            simulated = diagnostics.simulated
+        )
     }
 
     @Composable

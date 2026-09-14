@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diagnostics_title">DIAGNÓSTICO</string>
+    <string name="diagnostics_back">VOLTAR</string>
+    <string name="diagnostics_run">EXECUTAR SONDAGEM</string>
+    <string name="diagnostics_running">Sondando o adaptador…</string>
+    <string name="diagnostics_idle">Nenhuma sondagem executada nesta sessão.</string>
+    <string name="diagnostics_simulated">Transporte simulado. Nenhum adaptador conectado; os PIDs abaixo não são da Hunter.</string>
+    <string name="diagnostics_section_handshake">INICIALIZAÇÃO</string>
+    <string name="diagnostics_section_adapter">ADAPTADOR</string>
+    <string name="diagnostics_section_pids">PIDS SUPORTADOS</string>
+    <string name="diagnostics_protocol">Protocolo</string>
+    <string name="diagnostics_voltage">Tensão do adaptador</string>
+    <string name="diagnostics_discarded">Quadros descartados</string>
+    <string name="diagnostics_absent">—</string>
+    <string name="diagnostics_handshake_failed">A inicialização parou neste passo.</string>
+    <string name="diagnostics_no_pids">Nenhum PID descoberto.</string>
+    <plurals name="diagnostics_attempts">
+        <item quantity="one">%1$d tentativa</item>
+        <item quantity="other">%1$d tentativas</item>
+    </plurals>
+    <string name="diagnostics_timed_out">sem resposta</string>
+    <string name="diagnostics_range">Faixa %1$s</string>
+</resources>

@@ -146,7 +146,8 @@ private fun DashboardScreenPreview() {
                 onSelectVehicle = {},
                 onStartRecording = {},
                 onStopRecording = {},
-                onOpenHistory = {}
+                onOpenHistory = {},
+                onOpenDiagnostics = {}
             )
         )
     }

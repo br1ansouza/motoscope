@@ -12,6 +12,7 @@ tasks.register("quality") {
         ":core:ui",
         ":core:database",
         ":feature:dashboard",
+        ":feature:diagnostics",
         ":feature:history",
         ":feature:recording"
     ).forEach { module ->

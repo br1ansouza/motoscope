@@ -61,6 +61,7 @@ dependencies {
     implementation(project(":core:vehicle"))
     implementation(project(":core:history"))
     implementation(project(":feature:dashboard"))
+    implementation(project(":feature:diagnostics"))
     implementation(project(":feature:history"))
     implementation(project(":feature:recording"))
     implementation(project(":simulator"))
