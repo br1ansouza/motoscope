@@ -1,13 +1,13 @@
+import com.android.build.api.variant.HasUnitTestBuilder
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
     id("motoscope.quality")
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 37
     defaultConfig { minSdk = 26 }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -19,6 +19,12 @@ android {
         checkDependencies = true
     }
     testOptions.unitTests.isIncludeAndroidResources = true
+}
+
+androidComponents {
+    beforeVariants(selector().withBuildType("release")) { variant ->
+        (variant as? HasUnitTestBuilder)?.enableUnitTest = true
+    }
 }
 
 kotlin {
