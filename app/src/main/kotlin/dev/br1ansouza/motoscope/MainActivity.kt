@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,15 +20,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import dev.br1ansouza.motoscope.core.history.ExportFormat
 import dev.br1ansouza.motoscope.core.model.SessionId
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
 import dev.br1ansouza.motoscope.feature.dashboard.DashboardActions
 import dev.br1ansouza.motoscope.feature.dashboard.DashboardScreen
+import dev.br1ansouza.motoscope.feature.history.ExportNotice
 import dev.br1ansouza.motoscope.feature.history.HistoryActions
 import dev.br1ansouza.motoscope.feature.history.HistoryScreen
 import dev.br1ansouza.motoscope.feature.history.SessionDetailScreen
 import dev.br1ansouza.motoscope.feature.history.SessionDetailState
 import dev.br1ansouza.motoscope.feature.recording.RecordingService
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -55,6 +62,8 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             MotoScopeTheme {
+                var historyOpen by rememberSaveable { mutableStateOf(false) }
+                var openSessionId by rememberSaveable { mutableStateOf<String?>(null) }
                 val startup by runtime.startup.collectAsStateWithLifecycle()
                 val ready = startup as? StartupState.Ready
                 if (ready == null) {
@@ -64,8 +73,6 @@ class MainActivity : ComponentActivity() {
                 val state by runtime.telemetry.collectAsStateWithLifecycle()
                 val recording by runtime.recording.state.collectAsStateWithLifecycle()
                 val scope = rememberCoroutineScope()
-                var historyOpen by rememberSaveable { mutableStateOf(false) }
-                var openSessionId by rememberSaveable { mutableStateOf<String?>(null) }
                 if (historyOpen) {
                     HistoryRoute(
                         openSessionId = openSessionId,
@@ -107,7 +114,6 @@ class MainActivity : ComponentActivity() {
         onCloseSession: () -> Unit,
         onCloseHistory: () -> Unit
     ) {
-        val scope = rememberCoroutineScope()
         if (openSessionId == null) {
             BackHandler(onBack = onCloseHistory)
             val sessions by history.sessions.collectAsStateWithLifecycle()
@@ -116,17 +122,50 @@ class MainActivity : ComponentActivity() {
                 actions = HistoryActions(
                     onOpenSession = onOpenSession,
                     onDeleteSession = {},
+                    onExportSession = { _, _ -> },
                     onBack = onCloseHistory
                 )
             )
             return
         }
         BackHandler(onBack = onCloseSession)
+        SessionDetailRoute(
+            openSessionId = openSessionId,
+            onOpenSession = onOpenSession,
+            onCloseSession = onCloseSession
+        )
+    }
+
+    @Composable
+    private fun SessionDetailRoute(
+        openSessionId: String,
+        onOpenSession: (SessionId) -> Unit,
+        onCloseSession: () -> Unit
+    ) {
+        val scope = rememberCoroutineScope()
         val id = SessionId(openSessionId)
         var detail by remember(openSessionId) {
             mutableStateOf<SessionDetailState>(SessionDetailState.Loading)
         }
-        LaunchedEffect(openSessionId) { detail = history.detail(id) }
+        val notice by history.exportNotice.collectAsStateWithLifecycle()
+        LaunchedEffect(openSessionId) {
+            history.clearExportNotice()
+            detail = history.detail(id)
+        }
+        val createCsv = rememberLauncherForActivityResult(
+            ActivityResultContracts.CreateDocument(ExportFormat.CSV.mediaType)
+        ) { destination ->
+            if (destination != null) history.export(id, ExportFormat.CSV, destination)
+        }
+        val createJson = rememberLauncherForActivityResult(
+            ActivityResultContracts.CreateDocument(ExportFormat.JSON.mediaType)
+        ) { destination ->
+            if (destination != null) history.export(id, ExportFormat.JSON, destination)
+        }
+        val startedAt = (detail as? SessionDetailState.Ready)
+            ?.summary
+            ?.session
+            ?.startedAtEpochMillis
         SessionDetailScreen(
             state = detail,
             actions = HistoryActions(
@@ -137,8 +176,28 @@ class MainActivity : ComponentActivity() {
                         onCloseSession()
                     }
                 },
+                onExportSession = { _, format ->
+                    history.clearExportNotice()
+                    val name = exportFileName(startedAt, format)
+                    when (format) {
+                        ExportFormat.CSV -> createCsv.launch(name)
+                        ExportFormat.JSON -> createJson.launch(name)
+                    }
+                },
                 onBack = onCloseSession
-            )
+            ),
+            notice = notice
         )
     }
 }
+
+private fun exportFileName(startedAtEpochMillis: Long?, format: ExportFormat): String {
+    val stamp = startedAtEpochMillis
+        ?.let { Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()) }
+        ?.format(EXPORT_STAMP)
+        ?: "sessao"
+    return "motoscope-$stamp.${format.extension}"
+}
+
+private val EXPORT_STAMP: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm", Locale.forLanguageTag("pt-BR"))

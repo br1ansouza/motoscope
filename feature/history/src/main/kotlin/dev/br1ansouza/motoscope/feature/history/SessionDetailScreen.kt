@@ -3,6 +3,7 @@ package dev.br1ansouza.motoscope.feature.history
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import dev.br1ansouza.motoscope.core.history.ExportFormat
 import dev.br1ansouza.motoscope.core.model.MetricSummary
 import dev.br1ansouza.motoscope.core.model.MetricUnit
 import dev.br1ansouza.motoscope.core.model.RecordingSession
@@ -40,7 +42,8 @@ import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeTheme
 fun SessionDetailScreen(
     state: SessionDetailState,
     actions: HistoryActions,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    notice: ExportNotice? = null
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(modifier = Modifier.safeDrawingPadding()) {
@@ -48,14 +51,18 @@ fun SessionDetailScreen(
             when (state) {
                 SessionDetailState.Loading -> HistoryNotice(R.string.history_loading)
                 SessionDetailState.Missing -> HistoryNotice(R.string.history_detail_missing)
-                is SessionDetailState.Ready -> DetailBody(state, actions.onDeleteSession)
+                is SessionDetailState.Ready -> DetailBody(state, actions, notice)
             }
         }
     }
 }
 
 @Composable
-private fun DetailBody(state: SessionDetailState.Ready, onDelete: (SessionId) -> Unit) {
+private fun DetailBody(
+    state: SessionDetailState.Ready,
+    actions: HistoryActions,
+    notice: ExportNotice?
+) {
     val summary = state.summary
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(MotoScopeSpacing.small),
@@ -70,11 +77,21 @@ private fun DetailBody(state: SessionDetailState.Ready, onDelete: (SessionId) ->
         }
         item { SectionTitle(R.string.history_events_title) }
         items(items = state.events) { EventRow(it) }
+        item { SectionTitle(R.string.history_export_title) }
+        item {
+            ExportRow(
+                enabled = summary.sampleCount > 0,
+                onExport = { actions.onExportSession(summary.session.id, it) }
+            )
+        }
+        if (notice != null) {
+            item { HistoryNotice(notice.label()) }
+        }
         item {
             HoldToConfirm(
                 idle = R.string.history_delete,
                 held = R.string.history_delete_confirm,
-                onConfirm = { onDelete(summary.session.id) }
+                onConfirm = { actions.onDeleteSession(summary.session.id) }
             )
         }
     }
@@ -127,67 +144,6 @@ private fun SectionTitle(@StringRes title: Int) {
 }
 
 @Composable
-private fun MetricTableHeader() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MotoScopePalette.graphiteRaised)
-            .padding(MotoScopeSpacing.tiny),
-        horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)
-    ) {
-        HeaderCell(R.string.history_column_metric, WIDE_COLUMN, TextAlign.Start)
-        HeaderCell(R.string.history_column_minimum, NARROW_COLUMN, TextAlign.End)
-        HeaderCell(R.string.history_column_maximum, NARROW_COLUMN, TextAlign.End)
-        HeaderCell(R.string.history_column_average, NARROW_COLUMN, TextAlign.End)
-    }
-}
-
-@Composable
-private fun RowScope.HeaderCell(@StringRes label: Int, weight: Float, align: TextAlign) {
-    Text(
-        text = stringResource(label),
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        maxLines = 1,
-        textAlign = align,
-        modifier = Modifier.weight(weight)
-    )
-}
-
-@Composable
-private fun MetricRow(summary: MetricSummary) {
-    val labels = summary.metric.labels()
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(MotoScopeSizes.fieldBorder, MaterialTheme.colorScheme.outline)
-            .padding(MotoScopeSpacing.tiny),
-        horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)
-    ) {
-        Text(
-            text = stringResource(
-                R.string.history_metric_with_unit,
-                stringResource(labels.name),
-                stringResource(labels.unit)
-            ),
-            style = MaterialTheme.typography.labelLarge,
-            color = MotoScopePalette.gold,
-            modifier = Modifier.weight(WIDE_COLUMN)
-        )
-        listOf(summary.minimum, summary.maximum, summary.average).forEach { value ->
-            Text(
-                text = HistoryFormatting.value(value, summary.unit),
-                style = MaterialTheme.typography.labelLarge,
-                color = MotoScopePalette.ink,
-                maxLines = 1,
-                textAlign = TextAlign.End,
-                modifier = Modifier.weight(NARROW_COLUMN)
-            )
-        }
-    }
-}
-
-@Composable
 private fun EventRow(event: SessionEvent) {
     Row(
         modifier = Modifier
@@ -207,9 +163,6 @@ private fun EventRow(event: SessionEvent) {
         )
     }
 }
-
-private const val WIDE_COLUMN = 2f
-private const val NARROW_COLUMN = 1f
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 720)
 @Composable
@@ -260,6 +213,7 @@ private fun SessionDetailPreview() {
             actions = HistoryActions(
                 onOpenSession = {},
                 onDeleteSession = {},
+                onExportSession = { _, _ -> },
                 onBack = {}
             )
         )

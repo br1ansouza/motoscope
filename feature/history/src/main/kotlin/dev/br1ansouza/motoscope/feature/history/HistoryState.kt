@@ -1,9 +1,15 @@
 package dev.br1ansouza.motoscope.feature.history
 
+import dev.br1ansouza.motoscope.core.history.ExportFormat
 import dev.br1ansouza.motoscope.core.model.RecordingSession
 import dev.br1ansouza.motoscope.core.model.SessionEvent
 import dev.br1ansouza.motoscope.core.model.SessionId
 import dev.br1ansouza.motoscope.core.model.SessionSummary
+
+enum class ExportNotice {
+    DONE,
+    FAILED
+}
 
 sealed interface HistoryState {
     data object Loading : HistoryState
@@ -25,5 +31,6 @@ sealed interface SessionDetailState {
 data class HistoryActions(
     val onOpenSession: (SessionId) -> Unit,
     val onDeleteSession: (SessionId) -> Unit,
+    val onExportSession: (SessionId, ExportFormat) -> Unit,
     val onBack: () -> Unit
 )
