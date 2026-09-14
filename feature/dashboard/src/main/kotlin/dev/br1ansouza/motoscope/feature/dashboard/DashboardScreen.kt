@@ -99,8 +99,9 @@ private fun DashboardContent(
         verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
     ) {
         IndicatorRow(
-            leading = listOf(state.transport.indicator(), state.ecu.indicator()),
-            trailing = listOf(recording.indicator())
+            transport = state.transport.indicator(),
+            ecu = state.ecu.indicator(),
+            recording = recording.indicator()
         )
         if (state.simulated) SimulationNotice()
         DashboardBody(state = state, settings = settings, modifier = Modifier.weight(1f))
@@ -144,7 +145,9 @@ private fun DashboardScreenPreview() {
                 onSelectLayout = {},
                 onSelectVehicle = {},
                 onStartRecording = {},
-                onStopRecording = {}
+                onStopRecording = {},
+                onOpenHistory = {},
+                onOpenDiagnostics = {}
             )
         )
     }

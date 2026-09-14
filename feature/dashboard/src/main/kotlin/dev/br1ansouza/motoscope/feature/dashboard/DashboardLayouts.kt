@@ -1,5 +1,6 @@
 package dev.br1ansouza.motoscope.feature.dashboard
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,9 +15,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,7 @@ import dev.br1ansouza.motoscope.core.settings.DashboardLayout
 import dev.br1ansouza.motoscope.core.settings.DashboardMetrics
 import dev.br1ansouza.motoscope.core.telemetry.LiveTelemetry
 import dev.br1ansouza.motoscope.core.telemetry.MetricReading
-import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeReadingColors
+import dev.br1ansouza.motoscope.core.ui.labels
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeStatusColors
@@ -38,14 +39,20 @@ internal fun DashboardBody(
     settings: DashboardSettings,
     modifier: Modifier = Modifier
 ) {
-    val ordered = DashboardMetrics.SELECTABLE.filter { it in settings.visibleMetrics }
+    val ordered = remember(settings.visibleMetrics) {
+        DashboardMetrics.SELECTABLE.filter { it in settings.visibleMetrics }
+    }
     val engine = settings.vehicle.engine
+    val rpm = state.reading(TelemetryMetric.ENGINE_RPM)
+    val primary = metricDisplay(rpm, null)
+    val fraction = rpm.rpmFraction(engine)
     val shortScreen = windowHeight() < SHORT_SCREEN_HEIGHT
     Box(modifier = modifier) {
         if (shortScreen && settings.layout != DashboardLayout.UNIFORM) {
             Row(horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)) {
                 PrimaryReading(
-                    reading = state.reading(TelemetryMetric.ENGINE_RPM),
+                    display = primary,
+                    fraction = fraction,
                     engine = engine,
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                     compact = true
@@ -57,27 +64,40 @@ internal fun DashboardBody(
                 }
             }
         } else {
-            StandardDashboardBody(state, settings, Modifier.fillMaxWidth().fillMaxHeight())
+            StandardDashboardBody(
+                state = state,
+                settings = settings,
+                ordered = ordered,
+                primary = PrimaryDisplay(primary, fraction, engine),
+                modifier = Modifier.fillMaxWidth().fillMaxHeight()
+            )
         }
     }
 }
+
+internal data class PrimaryDisplay(
+    val display: MetricDisplay,
+    val fraction: Float,
+    val engine: EngineProfile
+)
 
 @Composable
 private fun StandardDashboardBody(
     state: LiveTelemetry,
     settings: DashboardSettings,
+    ordered: List<TelemetryMetric>,
+    primary: PrimaryDisplay,
     modifier: Modifier = Modifier
 ) {
-    val ordered = DashboardMetrics.SELECTABLE.filter { it in settings.visibleMetrics }
-    val engine = settings.vehicle.engine
     when (settings.layout) {
         DashboardLayout.PRIMARY_TOP -> Column(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
         ) {
             PrimaryReading(
-                reading = state.reading(TelemetryMetric.ENGINE_RPM),
-                engine = engine,
+                display = primary.display,
+                fraction = primary.fraction,
+                engine = primary.engine,
                 modifier = Modifier.weight(1f)
             )
             MetricGrid(state = state, metrics = ordered)
@@ -90,8 +110,9 @@ private fun StandardDashboardBody(
             val half = (ordered.size + 1) / 2
             MetricGrid(state = state, metrics = ordered.take(half))
             PrimaryReading(
-                reading = state.reading(TelemetryMetric.ENGINE_RPM),
-                engine = engine,
+                display = primary.display,
+                fraction = primary.fraction,
+                engine = primary.engine,
                 modifier = Modifier.weight(1f)
             )
             MetricGrid(state = state, metrics = ordered.drop(half))
@@ -100,7 +121,7 @@ private fun StandardDashboardBody(
         DashboardLayout.UNIFORM -> UniformGrid(
             state = state,
             metrics = ordered,
-            engine = engine,
+            primary = primary,
             modifier = modifier
         )
     }
@@ -110,7 +131,7 @@ private fun StandardDashboardBody(
 private fun UniformGrid(
     state: LiveTelemetry,
     metrics: List<TelemetryMetric>,
-    engine: EngineProfile,
+    primary: PrimaryDisplay,
     modifier: Modifier = Modifier
 ) {
     val cells = listOf(TelemetryMetric.ENGINE_RPM) + metrics
@@ -128,17 +149,19 @@ private fun UniformGrid(
                 row.forEach { metric ->
                     if (metric == TelemetryMetric.ENGINE_RPM) {
                         PrimaryReading(
-                            reading = state.reading(metric),
-                            engine = engine,
+                            display = primary.display,
+                            fraction = primary.fraction,
+                            engine = primary.engine,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
                             compact = true
                         )
                     } else {
+                        val labels = metric.labels()
                         MetricField(
-                            metric = metric,
-                            reading = state.reading(metric),
+                            label = labels.name,
+                            display = metricDisplay(state.reading(metric), labels.unit),
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
@@ -170,7 +193,8 @@ internal fun SimulationNotice() {
 
 @Composable
 private fun PrimaryReading(
-    reading: MetricReading?,
+    display: MetricDisplay,
+    fraction: Float,
     engine: EngineProfile,
     modifier: Modifier = Modifier,
     compact: Boolean = false
@@ -180,22 +204,14 @@ private fun PrimaryReading(
         modifier = modifier.fillMaxWidth(),
         fillHeight = true
     ) {
-        run {
-            val showBar = !compact
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.medium)
-            ) {
-                FieldValue(
-                    value = reading.display(),
-                    unit = null,
-                    color = reading.freshnessColor(),
-                    large = !compact
-                )
-                if (showBar) {
-                    RpmBar(fraction = reading.rpmFraction(engine), engine = engine)
-                }
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.medium)
+        ) {
+            FieldValue(display = display, large = !compact)
+            if (!compact) {
+                RpmBar(fraction = fraction, engine = engine)
             }
         }
     }
@@ -220,9 +236,10 @@ private fun MetricGrid(
                 horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.small)
             ) {
                 row.forEach { metric ->
+                    val labels = metric.labels()
                     MetricField(
-                        metric = metric,
-                        reading = state.reading(metric),
+                        label = labels.name,
+                        display = metricDisplay(state.reading(metric), labels.unit),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -236,38 +253,14 @@ private fun MetricGrid(
 
 @Composable
 private fun MetricField(
-    metric: TelemetryMetric,
-    reading: MetricReading?,
+    @StringRes label: Int,
+    display: MetricDisplay,
     modifier: Modifier = Modifier,
     fillHeight: Boolean = false
 ) {
-    val labels = metric.labels()
-    Field(label = labels.name, modifier = modifier, fillHeight = fillHeight) {
-        FieldValue(
-            value = reading.display(),
-            unit = if (reading?.freshness == Freshness.ABSENT) {
-                null
-            } else {
-                stringResource(labels.unit)
-            },
-            color = reading.freshnessColor(),
-            large = false
-        )
+    Field(label = label, modifier = modifier, fillHeight = fillHeight) {
+        FieldValue(display = display, large = false)
     }
-}
-
-@Composable
-internal fun MetricReading?.display(): String = if (this == null || freshness == Freshness.ABSENT) {
-    stringResource(R.string.dashboard_absent_value)
-} else {
-    MetricFormatting.format(sample.value, sample.unit)
-}
-
-internal fun MetricReading?.freshnessColor(): Color = when (this?.freshness) {
-    null -> MotoScopeReadingColors.absent
-    Freshness.FRESH -> MotoScopeReadingColors.fresh
-    Freshness.DELAYED -> MotoScopeReadingColors.delayed
-    Freshness.ABSENT -> MotoScopeReadingColors.absent
 }
 
 private const val COLUMNS = 3

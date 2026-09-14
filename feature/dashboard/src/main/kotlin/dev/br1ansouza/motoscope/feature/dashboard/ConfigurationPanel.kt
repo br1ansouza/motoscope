@@ -33,6 +33,7 @@ import dev.br1ansouza.motoscope.core.model.TelemetryMetric
 import dev.br1ansouza.motoscope.core.settings.DashboardLayout
 import dev.br1ansouza.motoscope.core.settings.DashboardMetrics
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopePalette
+import dev.br1ansouza.motoscope.core.ui.labels
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeStatusColors
@@ -113,18 +114,12 @@ private fun ConfigurationSections(settings: DashboardSettings, actions: Dashboar
                 )
             }
         }
-        Section(R.string.dashboard_section_storage, expandedByDefault = false) {
-            Text(
-                text = stringResource(R.string.dashboard_storage_pending),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        StorageAndDiagnosticsSections(actions = actions)
     }
 }
 
 @Composable
-private fun Section(
+internal fun Section(
     @StringRes title: Int,
     expandedByDefault: Boolean,
     content: @Composable () -> Unit

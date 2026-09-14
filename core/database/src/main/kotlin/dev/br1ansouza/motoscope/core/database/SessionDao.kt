@@ -13,6 +13,9 @@ internal interface SessionDao {
     @Query("SELECT * FROM sessions ORDER BY startedAtEpochMillis DESC, id ASC")
     fun observeSessions(): Flow<List<SessionEntity>>
 
+    @Query("SELECT * FROM sessions WHERE id = :id")
+    suspend fun find(id: String): SessionEntity?
+
     @Query(
         "SELECT * FROM sessions WHERE endedAtEpochMillis IS NULL ORDER BY startedAtEpochMillis ASC, id ASC"
     )

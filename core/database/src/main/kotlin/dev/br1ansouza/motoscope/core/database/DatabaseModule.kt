@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dev.br1ansouza.motoscope.core.history.HistoryStore
 import dev.br1ansouza.motoscope.core.recording.RecordingStore
 import dev.br1ansouza.motoscope.core.settings.DashboardPreferencesStore
 import dev.br1ansouza.motoscope.core.settings.MetricVisibilityStore
@@ -47,6 +48,9 @@ internal object DatabaseModule {
 internal abstract class RecordingStoreModule {
     @Binds
     abstract fun bindRecordingStore(store: RoomRecordingStore): RecordingStore
+
+    @Binds
+    abstract fun bindHistoryStore(store: RoomHistoryStore): HistoryStore
 
     @Binds
     abstract fun bindMetricVisibilityStore(store: RoomMetricVisibilityStore): MetricVisibilityStore

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="metric_engine_rpm">RPM</string>
+    <string name="metric_engine_temperature">MOTOR</string>
+    <string name="metric_system_voltage">BATERIA</string>
+    <string name="metric_throttle_position">TPS</string>
+    <string name="metric_vehicle_speed">VELOCIDADE</string>
+    <string name="metric_engine_load">CARGA</string>
+    <string name="metric_manifold_pressure">COLETOR</string>
+    <string name="metric_unit_rpm">rpm</string>
+    <string name="metric_unit_celsius">°C</string>
+    <string name="metric_unit_volt">V</string>
+    <string name="metric_unit_percent">%</string>
+    <string name="metric_unit_kmh">km/h</string>
+    <string name="metric_unit_kpa">kPa</string>
+</resources>

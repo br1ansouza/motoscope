@@ -63,10 +63,23 @@ class TelemetryEngine(
 
     private fun Snapshot.refreshed(): Snapshot {
         val now = clock.millis()
-        val readings = live.readings.mapValues { (_, reading) ->
-            reading.copy(freshness = window.classify(reading.sample, now))
+        val readings = live.readings.reclassified(now)
+        val ecu = ecuFrom(readings)
+        if (readings === live.readings && ecu == live.ecu) return this
+        return copy(live = live.copy(readings = readings, ecu = ecu))
+    }
+
+    private fun Map<TelemetryMetric, MetricReading>.reclassified(
+        nowMillis: Long
+    ): Map<TelemetryMetric, MetricReading> {
+        var updated: MutableMap<TelemetryMetric, MetricReading>? = null
+        for ((metric, reading) in this) {
+            val freshness = window.classify(reading.sample, nowMillis)
+            if (freshness == reading.freshness) continue
+            val target = updated ?: LinkedHashMap(this).also { updated = it }
+            target[metric] = reading.copy(freshness = freshness)
         }
-        return copy(live = live.copy(readings = readings, ecu = ecuFrom(readings)))
+        return updated ?: this
     }
 
     private fun Snapshot.ecuFrom(readings: Map<TelemetryMetric, MetricReading>): EcuState {

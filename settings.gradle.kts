@@ -19,6 +19,7 @@ include(
     ":app",
     ":core:model",
     ":core:telemetry",
+    ":core:history",
     ":core:recording",
     ":core:settings",
     ":core:vehicle",
@@ -27,5 +28,7 @@ include(
     ":protocol:elm327",
     ":simulator",
     ":feature:dashboard",
+    ":feature:diagnostics",
+    ":feature:history",
     ":feature:recording"
 )

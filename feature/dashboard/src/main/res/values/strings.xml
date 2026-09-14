@@ -4,9 +4,6 @@
     <string name="dashboard_indicator_ecu">ECU</string>
     <string name="dashboard_indicator_recording">REC</string>
     <string name="dashboard_primary_label">RPM</string>
-    <string name="dashboard_engine_temperature">MOTOR</string>
-    <string name="dashboard_system_voltage">BATERIA</string>
-    <string name="dashboard_throttle">TPS</string>
     <string name="dashboard_absent_value">—</string>
     <string name="dashboard_rpm_scale_min">0</string>
     <string name="dashboard_simulated">Dados simulados. Nenhuma moto conectada.</string>
@@ -27,9 +24,6 @@
         <item quantity="one">%1$d amostra</item>
         <item quantity="other">%1$d amostras</item>
     </plurals>
-    <string name="dashboard_vehicle_speed">VELOCIDADE</string>
-    <string name="dashboard_engine_load">CARGA</string>
-    <string name="dashboard_manifold_pressure">COLETOR</string>
     <string name="dashboard_menu_title">CONFIGURAÇÃO</string>
     <string name="dashboard_section_vehicle">MOTO</string>
     <string name="dashboard_section_metrics">MÉTRICAS</string>
@@ -37,6 +31,10 @@
     <string name="dashboard_section_storage">ARMAZENAMENTO</string>
     <string name="dashboard_section_collapse">−</string>
     <string name="dashboard_section_expand">+</string>
+    <string name="dashboard_section_diagnostics">DIAGNÓSTICO</string>
+    <string name="dashboard_diagnostics_hint">Ferramenta técnica: inicialização do adaptador e descoberta de PIDs.</string>
+    <string name="dashboard_open_diagnostics">ABRIR DIAGNÓSTICO</string>
+    <string name="dashboard_open_history">SESSÕES GRAVADAS</string>
     <string name="dashboard_storage_pending">Os registros ficam no armazenamento privado do aplicativo. A escolha de pasta entra com a exportação.</string>
     <string name="dashboard_layout_primary_top">RPM em cima, demais embaixo</string>
     <string name="dashboard_layout_primary_centered">Metade em cima, RPM no meio, metade embaixo</string>
@@ -44,11 +42,6 @@
     <string name="dashboard_vehicle_engine">%1$d cm³ · corte não validado: %2$s rpm</string>
     <string name="dashboard_metrics_open">MÉTRICAS</string>
     <string name="dashboard_metrics_close">FECHAR</string>
-    <string name="dashboard_unit_kmh">km/h</string>
-    <string name="dashboard_unit_kpa">kPa</string>
-    <string name="dashboard_unit_celsius">°C</string>
-    <string name="dashboard_unit_volt">V</string>
-    <string name="dashboard_unit_percent">%</string>
     <string name="dashboard_recording_failed">Falha ao gravar</string>
     <string name="dashboard_recording_retry">SEGURE PARA SALVAR E ENCERRAR</string>
 </resources>

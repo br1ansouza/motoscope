@@ -1,8 +1,8 @@
+import com.android.build.api.variant.HasUnitTestBuilder
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "dev.br1ansouza.motoscope"
-    compileSdk = 35
+    compileSdk = 37
     defaultConfig {
         applicationId = "dev.br1ansouza.motoscope"
         minSdk = 26
@@ -45,6 +45,12 @@ kotlin {
     }
 }
 
+androidComponents {
+    beforeVariants(selector().withBuildType("release")) { variant ->
+        (variant as? HasUnitTestBuilder)?.enableUnitTest = true
+    }
+}
+
 hilt { enableAggregatingTask = true }
 
 dependencies {
@@ -53,7 +59,10 @@ dependencies {
     implementation(project(":core:recording"))
     implementation(project(":core:settings"))
     implementation(project(":core:vehicle"))
+    implementation(project(":core:history"))
     implementation(project(":feature:dashboard"))
+    implementation(project(":feature:diagnostics"))
+    implementation(project(":feature:history"))
     implementation(project(":feature:recording"))
     implementation(project(":simulator"))
     implementation(project(":core:database"))

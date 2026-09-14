@@ -35,15 +35,16 @@ internal data class IndicatorState(
 
 @Composable
 internal fun IndicatorRow(
-    leading: List<IndicatorState>,
-    trailing: List<IndicatorState>,
+    transport: IndicatorState,
+    ecu: IndicatorState,
+    recording: IndicatorState,
     modifier: Modifier = Modifier
 ) {
     val narrow = windowWidth() < NARROW_WIDTH
     Box(modifier = modifier.fillMaxWidth()) {
         if (narrow) {
             Row(horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)) {
-                (leading + trailing).forEach { state ->
+                listOf(transport, ecu, recording).forEach { state ->
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(state.label),
@@ -59,7 +60,7 @@ internal fun IndicatorRow(
                 }
             }
         } else {
-            WideIndicatorRow(leading, trailing)
+            WideIndicatorRow(transport, ecu, recording)
         }
     }
 }
@@ -67,14 +68,18 @@ internal fun IndicatorRow(
 private val NARROW_WIDTH = 600.dp
 
 @Composable
-private fun WideIndicatorRow(leading: List<IndicatorState>, trailing: List<IndicatorState>) {
+private fun WideIndicatorRow(
+    transport: IndicatorState,
+    ecu: IndicatorState,
+    recording: IndicatorState
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IndicatorGroup(indicators = leading)
-        IndicatorGroup(indicators = trailing)
+        IndicatorGroup(indicators = listOf(transport, ecu))
+        IndicatorGroup(indicators = listOf(recording))
     }
 }
 
