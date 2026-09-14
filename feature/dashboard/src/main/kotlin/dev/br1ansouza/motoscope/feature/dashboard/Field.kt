@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -62,38 +63,35 @@ internal fun Field(
 }
 
 @Composable
-internal fun FieldValue(
-    value: String,
-    unit: String?,
-    color: androidx.compose.ui.graphics.Color,
-    large: Boolean
-) {
+internal fun FieldValue(display: MetricDisplay, large: Boolean) {
     val narrow = windowWidth() < NARROW_VALUE_WIDTH
     val fullStyle = if (large) {
         MaterialTheme.typography.displayLarge
     } else {
         MaterialTheme.typography.displaySmall
     }
-    val baseStyle = if (narrow) {
-        fullStyle.copy(fontSize = fullStyle.fontSize * NARROW_VALUE_SCALE)
-    } else {
-        fullStyle
+    val baseStyle = remember(fullStyle, narrow) {
+        if (narrow) {
+            fullStyle.copy(fontSize = fullStyle.fontSize * NARROW_VALUE_SCALE)
+        } else {
+            fullStyle
+        }
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = value,
+            text = display.value,
             style = baseStyle,
-            color = color,
+            color = display.color,
             maxLines = 1,
             softWrap = false,
             textAlign = TextAlign.Center
         )
-        if (unit != null) {
+        if (display.unit != null) {
             Text(
-                text = unit,
+                text = display.unit,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
