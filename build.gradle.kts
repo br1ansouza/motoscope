@@ -12,6 +12,7 @@ tasks.register("quality") {
         ":core:ui",
         ":core:database",
         ":feature:dashboard",
+        ":feature:history",
         ":feature:recording"
     ).forEach { module ->
         dependsOn(
@@ -27,6 +28,7 @@ tasks.register("quality") {
     listOf(
         ":core:model",
         ":core:telemetry",
+        ":core:history",
         ":core:recording",
         ":core:settings",
         ":core:vehicle",
