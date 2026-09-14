@@ -165,7 +165,11 @@ private fun MetricRow(summary: MetricSummary) {
         horizontalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)
     ) {
         Text(
-            text = stringResource(labels.name),
+            text = stringResource(
+                R.string.history_metric_with_unit,
+                stringResource(labels.name),
+                stringResource(labels.unit)
+            ),
             style = MaterialTheme.typography.labelLarge,
             color = MotoScopePalette.gold,
             modifier = Modifier.weight(WIDE_COLUMN)
