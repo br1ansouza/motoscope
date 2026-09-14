@@ -21,6 +21,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeRpmColors
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
@@ -49,7 +50,11 @@ internal fun RpmBar(fraction: Float, engine: EngineProfile, modifier: Modifier =
         ) {
             repeat(SCALE_DIVISIONS + 1) { index ->
                 Text(
-                    text = MetricFormatting.integer(engine.scaleMaxRpm.toDouble() * index / SCALE_DIVISIONS),
+                    text = if (index == 0) {
+                        stringResource(R.string.dashboard_rpm_scale_min)
+                    } else {
+                        MetricFormatting.integer(engine.scaleMaxRpm.toDouble() * index / SCALE_DIVISIONS)
+                    },
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
