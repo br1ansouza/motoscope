@@ -1,4 +1,5 @@
 import com.android.build.api.variant.HasUnitTestBuilder
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -9,21 +10,36 @@ plugins {
     id("motoscope.quality")
 }
 
+val keystoreProperties = rootProject.file("keystore.properties").takeIf { it.isFile }?.let {
+    Properties().apply { it.inputStream().use(::load) }
+}
+
 android {
     namespace = "dev.br1ansouza.motoscope"
     compileSdk = 37
     defaultConfig {
         applicationId = "dev.br1ansouza.motoscope"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        targetSdk = 37
+        versionCode = 2
+        versionName = "0.2.0"
+    }
+    signingConfigs {
+        keystoreProperties?.let { properties ->
+            create("release") {
+                storeFile = rootProject.file(properties.getProperty("storeFile"))
+                storePassword = properties.getProperty("storePassword")
+                keyAlias = properties.getProperty("keyAlias")
+                keyPassword = properties.getProperty("keyPassword")
+            }
+        }
     }
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            signingConfig = signingConfigs.findByName("release")
         }
     }
     compileOptions {
