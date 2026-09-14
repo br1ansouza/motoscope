@@ -37,6 +37,7 @@
     <string name="dashboard_section_storage">ARMAZENAMENTO</string>
     <string name="dashboard_section_collapse">−</string>
     <string name="dashboard_section_expand">+</string>
+    <string name="dashboard_open_history">SESSÕES GRAVADAS</string>
     <string name="dashboard_storage_pending">Os registros ficam no armazenamento privado do aplicativo. A escolha de pasta entra com a exportação.</string>
     <string name="dashboard_layout_primary_top">RPM em cima, demais embaixo</string>
     <string name="dashboard_layout_primary_centered">Metade em cima, RPM no meio, metade embaixo</string>

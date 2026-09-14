@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">SESSÕES</string>
+    <string name="history_back">VOLTAR</string>
+    <string name="history_empty">Nenhuma sessão gravada ainda.</string>
+    <string name="history_loading">Lendo as sessões…</string>
+    <string name="history_status_recording">gravando</string>
+    <string name="history_status_finished">encerrada</string>
+    <string name="history_status_interrupted">interrompida</string>
+    <string name="history_duration_open">em andamento</string>
+    <string name="history_detail_title">RESUMO</string>
+    <string name="history_detail_missing">Sessão não encontrada.</string>
+    <string name="history_column_metric">MÉTRICA</string>
+    <string name="history_column_minimum">MÍN</string>
+    <string name="history_column_maximum">MÁX</string>
+    <string name="history_column_average">MÉD</string>
+    <string name="history_events_title">EVENTOS</string>
+    <string name="history_no_metrics">Nenhuma amostra gravada nesta sessão.</string>
+    <string name="history_delete">APAGAR SESSÃO</string>
+    <string name="history_delete_confirm">SEGURE PARA APAGAR</string>
+    <string name="history_event_recording_started">gravação iniciada</string>
+    <string name="history_event_recording_resumed">gravação retomada</string>
+    <string name="history_event_recording_interrupted">gravação interrompida</string>
+    <string name="history_event_recording_finished">gravação encerrada</string>
+    <string name="history_event_transport_lost">transporte perdido</string>
+    <string name="history_event_transport_recovered">transporte recuperado</string>
+    <string name="history_event_data_gap_started">intervalo sem dados</string>
+    <string name="history_event_data_gap_ended">dados voltaram</string>
+    <plurals name="history_sample_count">
+        <item quantity="one">%d amostra</item>
+        <item quantity="other">%d amostras</item>
+    </plurals>
+</resources>
