@@ -22,6 +22,10 @@ detekt {
     )
 }
 
+tasks.withType<Test>().configureEach {
+    failOnNoDiscoveredTests.set(projectDir.resolve("src/test").isDirectory)
+}
+
 ktlint {
     version.set(catalog.findVersion("ktlint").get().requiredVersion)
     filter {
