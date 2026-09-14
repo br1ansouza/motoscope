@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <lint>
     <!-- A fundação usa um conjunto estável validado, sem perseguir a última versão.
-         Estes avisos continuam nos relatórios. Dependabot propõe atualizações para revisão.
-         SDK 35 é deliberado neste ciclo sem distribuição na Play Store. -->
+         Estes avisos continuam nos relatórios. Dependabot propõe atualizações para revisão. -->
     <issue id="GradleDependency,AndroidGradlePluginVersion,OldTargetApi" severity="informational" />
+
+    <!-- O painel é lido em suporte de guidão, com o aparelho deitado e a moto inclinando.
+         Deixar a orientação livre faria a tela girar em curva, que é justamente quando ela
+         precisa estar legível. `sensorLandscape` aceita os dois sentidos de paisagem, então
+         o suporte pode ser montado de qualquer lado.
+         O Android 16 ignora orientação fixa em telas grandes: no tablet de validação o
+         travamento não tem efeito, e o painel continua se adaptando por largura de janela.
+         Vale no celular, que é o aparelho de uso real. -->
+    <issue id="DiscouragedApi" severity="informational" />
 </lint>
