@@ -95,8 +95,8 @@ internal fun HoldToConfirm(
                 }
             ),
         shape = MaterialTheme.shapes.large,
-        color = MotoScopeStatusColors.failure,
-        border = BorderStroke(MotoScopeSizes.fieldBorder, MotoScopePalette.gold)
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(MotoScopeSizes.fieldBorder, MotoScopeStatusColors.failure)
     ) {
         Column(
             modifier = Modifier.padding(MotoScopeSpacing.small),
@@ -105,7 +105,7 @@ internal fun HoldToConfirm(
             Text(
                 text = stringResource(idle),
                 style = MaterialTheme.typography.labelLarge,
-                color = MotoScopePalette.ink,
+                color = MotoScopeStatusColors.failure,
                 textAlign = TextAlign.Center
             )
         }

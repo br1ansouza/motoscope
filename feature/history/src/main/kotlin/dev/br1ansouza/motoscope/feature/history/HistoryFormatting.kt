@@ -6,6 +6,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 
 internal object HistoryFormatting {
     private val locale: Locale = Locale.forLanguageTag("pt-BR")
@@ -23,8 +24,7 @@ internal object HistoryFormatting {
     fun count(value: Long): String = whole.format(value)
 
     fun value(value: Double, unit: MetricUnit): String = when (unit) {
-        MetricUnit.VOLT -> oneDecimal.format(value)
-        MetricUnit.PERCENT -> oneDecimal.format(value)
+        MetricUnit.REVOLUTIONS_PER_MINUTE -> whole.format(value.roundToInt())
         else -> oneDecimal.format(value)
     }
 

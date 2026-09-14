@@ -27,7 +27,9 @@ internal class RoomHistoryStore @Inject constructor(
 
     override suspend fun summary(id: SessionId): SessionSummary? {
         val session = sessions.find(id.value)?.toSession() ?: return null
-        val metrics = samples.summarize(id.value).mapNotNull { it.toSummary() }
+        val metrics = samples.summarize(id.value)
+            .mapNotNull { it.toSummary() }
+            .sortedBy { it.metric.ordinal }
         return SessionSummary(
             session = session,
             sampleCount = metrics.sumOf { it.count },

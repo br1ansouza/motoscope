@@ -16,6 +16,7 @@
     <string name="history_column_average">MÉD</string>
     <string name="history_events_title">EVENTOS</string>
     <string name="history_no_metrics">Nenhuma amostra gravada nesta sessão.</string>
+    <string name="history_metric_with_unit">%1$s %2$s</string>
     <string name="history_delete">APAGAR SESSÃO</string>
     <string name="history_delete_confirm">SEGURE PARA APAGAR</string>
     <string name="history_event_recording_started">gravação iniciada</string>
