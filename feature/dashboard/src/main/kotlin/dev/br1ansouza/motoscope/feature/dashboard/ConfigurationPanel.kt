@@ -33,6 +33,7 @@ import dev.br1ansouza.motoscope.core.model.TelemetryMetric
 import dev.br1ansouza.motoscope.core.settings.DashboardLayout
 import dev.br1ansouza.motoscope.core.settings.DashboardMetrics
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopePalette
+import dev.br1ansouza.motoscope.core.ui.labels
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeStatusColors
