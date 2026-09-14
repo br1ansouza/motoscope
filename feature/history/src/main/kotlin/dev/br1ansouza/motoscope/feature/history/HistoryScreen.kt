@@ -150,6 +150,7 @@ private fun HistoryScreenPreview() {
             actions = HistoryActions(
                 onOpenSession = {},
                 onDeleteSession = {},
+                onExportSession = { _, _ -> },
                 onBack = {}
             )
         )

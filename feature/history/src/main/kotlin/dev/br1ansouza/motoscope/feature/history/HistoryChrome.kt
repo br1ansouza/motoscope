@@ -113,6 +113,12 @@ internal fun HoldToConfirm(
 }
 
 @StringRes
+internal fun ExportNotice.label(): Int = when (this) {
+    ExportNotice.DONE -> R.string.history_export_done
+    ExportNotice.FAILED -> R.string.history_export_failed
+}
+
+@StringRes
 internal fun SessionStatus.label(): Int = when (this) {
     SessionStatus.RECORDING -> R.string.history_status_recording
     SessionStatus.FINISHED -> R.string.history_status_finished
