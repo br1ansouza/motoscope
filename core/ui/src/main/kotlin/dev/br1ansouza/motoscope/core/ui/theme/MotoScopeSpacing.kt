@@ -13,7 +13,9 @@ object MotoScopeSizes {
     val indicatorDot = 10.dp
     val fieldBorder = 1.dp
     val accentBar = 3.dp
-    val rpmBarHeight = 28.dp
+    val rpmBarHeight = 64.dp
+    val rpmSegmentGap = 4.dp
+    val rpmSegmentRadius = 2.dp
     val checkBox = 18.dp
     val metricsButtonWidth = 56.dp
     val metricsGlyph = 28.dp

@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeRpmColors
+import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSizes
 import dev.br1ansouza.motoscope.core.ui.theme.MotoScopeSpacing
 import dev.br1ansouza.motoscope.core.vehicle.EngineProfile
 
@@ -41,7 +41,7 @@ internal fun RpmBar(fraction: Float, engine: EngineProfile, modifier: Modifier =
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(BAR_HEIGHT)
+                .height(MotoScopeSizes.rpmBarHeight)
                 .rpmSegments(level, engine)
         )
         Row(
@@ -65,8 +65,8 @@ internal fun RpmBar(fraction: Float, engine: EngineProfile, modifier: Modifier =
 
 private fun Modifier.rpmSegments(level: State<Float>, engine: EngineProfile): Modifier = drawWithCache {
     val step = size.width / SEGMENTS
-    val gap = SEGMENT_GAP.toPx().coerceAtMost(step * MAX_GAP_RATIO)
-    val radius = CornerRadius(SEGMENT_RADIUS.toPx())
+    val gap = MotoScopeSizes.rpmSegmentGap.toPx().coerceAtMost(step * MAX_GAP_RATIO)
+    val radius = CornerRadius(MotoScopeSizes.rpmSegmentRadius.toPx())
     val segments = List(SEGMENTS) { index ->
         val position = index.toFloat() / (SEGMENTS - 1)
         val height = size.height * (MIN_HEIGHT + HEIGHT_RISE * position)
@@ -115,9 +115,6 @@ private fun segmentColor(position: Float, engine: EngineProfile): Color {
     }
 }
 
-private val BAR_HEIGHT = 64.dp
-private val SEGMENT_GAP = 4.dp
-private val SEGMENT_RADIUS = 2.dp
 private const val SEGMENTS = 48
 private const val SCALE_DIVISIONS = 7
 private const val SWEEP_MILLIS = 90
