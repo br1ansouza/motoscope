@@ -1,9 +1,9 @@
 package dev.br1ansouza.motoscope.feature.diagnostics
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -90,34 +93,47 @@ private fun DiagnosticsHeader(onBack: () -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.diagnostics_title),
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.titleMedium,
             color = MotoScopePalette.gold
         )
-        Text(
-            text = stringResource(R.string.diagnostics_back),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .border(MotoScopeSizes.fieldBorder, MaterialTheme.colorScheme.outline)
-                .clickable(onClick = onBack)
-                .padding(horizontal = MotoScopeSpacing.small, vertical = MotoScopeSpacing.tiny)
-        )
+        OutlinedButton(
+            onClick = onBack,
+            shape = MaterialTheme.shapes.small,
+            border = BorderStroke(MotoScopeSizes.fieldBorder, MaterialTheme.colorScheme.outline)
+        ) {
+            Text(
+                text = stringResource(R.string.diagnostics_back),
+                style = MaterialTheme.typography.labelLarge,
+                color = MotoScopePalette.ink
+            )
+        }
     }
 }
 
 @Composable
 private fun RunButton(enabled: Boolean, onClick: () -> Unit) {
-    Text(
-        text = stringResource(R.string.diagnostics_run),
-        style = MaterialTheme.typography.labelLarge,
-        color = if (enabled) MotoScopePalette.gold else MaterialTheme.colorScheme.onSurfaceVariant,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(MotoScopeSizes.fieldBorder, MaterialTheme.colorScheme.outline)
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(MotoScopeSpacing.small)
-    )
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.small,
+        border = BorderStroke(
+            MotoScopeSizes.fieldBorder,
+            if (enabled) MotoScopePalette.gold else MaterialTheme.colorScheme.outline
+        ),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MotoScopePalette.darkRed,
+            contentColor = MotoScopePalette.ink
+        )
+    ) {
+        Text(
+            text = stringResource(
+                if (enabled) R.string.diagnostics_run else R.string.diagnostics_running
+            ),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(vertical = MotoScopeSpacing.small)
+        )
+    }
 }
 
 @Composable
@@ -126,7 +142,10 @@ private fun SectionTitle(@StringRes title: Int) {
         text = stringResource(title),
         style = MaterialTheme.typography.labelLarge,
         color = MotoScopePalette.gold,
-        modifier = Modifier.padding(top = MotoScopeSpacing.small)
+        modifier = Modifier.fillMaxWidth()
+            .padding(top = MotoScopeSpacing.small)
+            .background(MotoScopePalette.graphiteRaised)
+            .padding(MotoScopeSpacing.small)
     )
 }
 
@@ -146,11 +165,12 @@ private fun HandshakeRow(step: ElmHandshakeStep, failed: Boolean) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(MotoScopePalette.graphite)
             .border(
                 MotoScopeSizes.fieldBorder,
                 if (failed) MotoScopeStatusColors.failure else MaterialTheme.colorScheme.outline
             )
-            .padding(MotoScopeSpacing.tiny)
+            .padding(MotoScopeSpacing.small)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -163,6 +183,8 @@ private fun HandshakeRow(step: ElmHandshakeStep, failed: Boolean) {
             )
             Text(
                 text = step.exchange.describe(),
+                modifier = Modifier.weight(1f).padding(start = MotoScopeSpacing.medium),
+                textAlign = TextAlign.End,
                 style = MaterialTheme.typography.labelLarge,
                 color = MotoScopePalette.ink
             )
@@ -192,8 +214,9 @@ private fun AdapterFacts(report: DiagnosticsReport) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(MotoScopePalette.graphite)
             .border(MotoScopeSizes.fieldBorder, MaterialTheme.colorScheme.outline)
-            .padding(MotoScopeSpacing.tiny),
+            .padding(MotoScopeSpacing.small),
         verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)
     ) {
         Fact(R.string.diagnostics_protocol, report.protocol ?: absent)
@@ -210,11 +233,14 @@ private fun Fact(@StringRes label: Int, value: String) {
     ) {
         Text(
             text = stringResource(label),
+            modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = value,
+            modifier = Modifier.weight(1f).padding(start = MotoScopeSpacing.medium),
+            textAlign = TextAlign.End,
             style = MaterialTheme.typography.labelLarge,
             color = MotoScopePalette.ink
         )
@@ -226,8 +252,9 @@ private fun RangeRow(range: SupportedPidRange) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(MotoScopePalette.graphite)
             .border(MotoScopeSizes.fieldBorder, MaterialTheme.colorScheme.outline)
-            .padding(MotoScopeSpacing.tiny),
+            .padding(MotoScopeSpacing.small),
         verticalArrangement = Arrangement.spacedBy(MotoScopeSpacing.tiny)
     ) {
         Text(
